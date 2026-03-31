@@ -1,0 +1,20 @@
+// middleware.ts
+export function middleware(request: NextRequest) {
+  const token = request.cookies.get('accessToken')
+  const { pathname } = request.nextUrl
+
+  // 1. If the user is on the login page, don't redirect them to login!
+  if (pathname === '/login' || pathname === '/register') {
+    return NextResponse.next()
+  }
+
+  // 2. If there is no token and they aren't on a public page, redirect
+  if (!token) {
+    return NextResponse.redirect(new URL('/login', request.url))
+  }
+}
+
+// 3. Ensure your matcher doesn't catch internal Next.js files
+export const config = {
+  matcher: ['/((?!api|_next/static|_next/image|favicon.ico).*)'],
+}

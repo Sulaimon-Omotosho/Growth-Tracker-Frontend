@@ -20,6 +20,7 @@ export function useLogin() {
 
 export function useGoogleLogin() {
   const queryClient = useQueryClient()
+  const router = useRouter()
 
   return useMutation({
     mutationFn: (token: string) =>
@@ -30,6 +31,7 @@ export function useGoogleLogin() {
 
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['me'] })
+      router.push('/admin')
     },
   })
 }
