@@ -1,25 +1,58 @@
 'use client'
 
-import { signIn } from 'next-auth/react'
 import Image from 'next/image'
-import React from 'react'
+import { useGoogleLogin as useAuthMutation } from '@/hooks/use-auth'
+import { useGoogleLogin } from '@react-oauth/google'
+import { Button } from './ui/button'
+import { Loader2 } from 'lucide-react'
 
 const LoginGoogle = () => {
+  const mutation = useAuthMutation()
+
+  const login = useGoogleLogin({
+    onSuccess: async (tokenResponse) => {
+      // Pass the access token to your custom backend mutation
+      mutation.mutate(tokenResponse.access_token)
+    },
+    onError: (error) => {
+      console.error('Google Login Failed', error)
+    },
+  })
+
+  // Check if the mutation is currently hitting your backend
+  const isLoading = mutation.isPending
+
   return (
-    <button
+    <Button
       type='button'
-      onClick={() => signIn('google', { callbackUrl: '/redirect' })}
-      className='flex items-center justify-center p-1 gap-4 ring-1 ring-amber-600 dark:ring-amber-400 rounded-md mb-2 w-full cursor-pointer'
+      variant='outline'
+      disabled={isLoading}
+      onClick={() => login()}
+      className='cursor-pointer w-full h-11 relative flex items-center justify-center gap-3 rounded-xl border-gray-200 dark:border-gray-800 bg-white dark:bg-transparent hover:bg-gray-50 dark:hover:bg-gray-900 transition-all active:scale-[0.98]'
     >
-      <Image
-        src='/assets/google.png'
-        alt='google'
-        width={20}
-        height={20}
-        className='object-contain'
-      />
-      <span>Use Google</span>
-    </button>
+      {isLoading ? (
+        <>
+          <Loader2 className='h-4 w-4 animate-spin text-muted-foreground' />
+          <span className='text-sm font-medium text-muted-foreground'>
+            Authenticating...
+          </span>
+        </>
+      ) : (
+        <>
+          <div className='relative w-5 h-5'>
+            <Image
+              src='/assets/google.png'
+              alt='google'
+              fill
+              className='object-contain'
+            />
+          </div>
+          <span className='text-sm font-bold tracking-tight'>
+            Continue with Google
+          </span>
+        </>
+      )}
+    </Button>
   )
 }
 

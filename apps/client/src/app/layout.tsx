@@ -4,6 +4,7 @@ import './globals.css'
 import { ThemeProvider } from '../utils/theme-provider'
 import Providers from '../lib/Providers'
 import AuthGuard from '../lib/AuthGuard'
+import { Toaster } from 'sonner'
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -34,18 +35,12 @@ export default async function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <div className=''>
-          <Providers>
-            <AuthGuard>
-              <ThemeProvider
-                attribute='class'
-                defaultTheme='system'
-                enableSystem
-                disableTransitionOnChange
-              >
-                {children}
-              </ThemeProvider>
-            </AuthGuard>
-          </Providers>
+          <ThemeProvider>
+            <Providers>
+              <AuthGuard>{children}</AuthGuard>
+            </Providers>
+            <Toaster position='bottom-right' />
+          </ThemeProvider>
         </div>
       </body>
     </html>

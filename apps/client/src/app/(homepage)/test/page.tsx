@@ -1,10 +1,9 @@
 'use client'
 
-import { useCurrentUser } from '@/src/hooks/useCurrentUser'
-import { useUserByEmail } from '@/src/hooks/useUserByEmail'
+import { useMe } from '@/hooks/get-user'
 
 const Test = () => {
-  const { data: user, isLoading, error } = useCurrentUser()
+  const { data: user, isLoading, error } = useMe()
   // console.log('user:', user)
 
   if (isLoading) return <p className='pt-40'>Loading...</p>
@@ -14,7 +13,7 @@ const Test = () => {
     <div className='pt-40 pb-20 text-center'>
       {/* <TestUser /> */}
       <p className='mt-6 text-xl'>DB User ID: {user?.id ?? 'null'}</p>
-      <p className='mt-6 text-xl'>DB User AuthID: {user?.authId ?? 'null'}</p>
+      {/* <p className='mt-6 text-xl'>DB User AuthID: {user?.authId ?? 'null'}</p> */}
       <p className='mt-6 text-xl'>DB User Name: {user?.firstName ?? 'null'}</p>
     </div>
   )

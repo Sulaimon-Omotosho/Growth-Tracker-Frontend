@@ -1,10 +1,13 @@
 'use client'
 
-import { GroupAvatar } from '@/src/components/dashboard/GroupAvatar'
-import { NextStepChart } from '@/src/components/dashboard/NextStepChart'
-import { RightDrawer } from '@/src/components/dashboard/RightDrawer'
-import UserForm from '@/src/components/forms/UserForm'
-import { useUser } from '@/src/utils/userContext'
+import CoursesnActivitiesSummary from '@/components/dashboard/CoursesnActivitiesSummary'
+import DepartmentsNSmallGroups from '@/components/dashboard/DepartmentsNSmallGroups'
+import { GroupAvatar } from '@/components/dashboard/GroupAvatar'
+import { NextStepChart } from '@/components/dashboard/NextStepChart'
+import { RightDrawer } from '@/components/dashboard/RightDrawer'
+import UserForm from '@/components/forms/UserForm'
+import { useUpdateAddress, useUpdateProfile } from '@/hooks/use-auth'
+import { useUser } from '@/utils/userContext'
 import {
   ArrowRight,
   ChevronRight,
@@ -19,229 +22,182 @@ import {
   UserIcon,
 } from 'lucide-react'
 import Image from 'next/image'
+import { useState } from 'react'
 
 const ProfilePage = () => {
-  const { user } = useUser()
+  const { user, isLoading } = useUser()
+  console.log('Profile:', user)
+
+  // Calculate total lead roles
+  const counts = user?._count
+  const totalRoles = counts
+    ? counts.leadsCell +
+      counts.leadsChurchTeam +
+      counts.leadsCommunity +
+      counts.hod +
+      counts.leadsSubTeam +
+      counts.districtsLed +
+      counts.leadsZone
+    : 0
+
+  // Form States
+  const [isSubmitDisabled, setIsSubmitDisabled] = useState(true)
+  const [isOpen, setIsOpen] = useState<'edit' | null>(null)
+  const updateProfile = useUpdateProfile()
+  const updateAddress = useUpdateAddress()
 
   return (
-    <section className='flex flex-col lg:flex-row gap-4 lg:gap-1'>
+    <section className='flex flex-col lg:flex-row min-h-screen'>
       {/* LEFT  */}
-      <section className='flex-2/3 p-4 lg:p-6'>
+      <section className='w-full lg:w-2/3 p-4 lg:p-6'>
         {/* PROFILE  */}
-        <section className='flex flex-col md:flex-row justify-center md:justify-between gap-6 p-4  rounded-xl bg-gray-200 dark:bg-gray-900  mb-5'>
+        <section className='flex flex-col md:flex-row justify-center md:justify-between gap-6 p-4 rounded-xl bg-gray-200 dark:bg-gray-900 mb-5'>
           {/* Profile Image  */}
-          <div className='flex-1/3 w-full md:w-auto flex items-center justify-center'>
-            <div className='h-40 w-40 overflow-hidden flex items-center justify-center rounded-full ring-2 ring-black'>
-              {user.image ? (
+          <div className='shrink-0 flex items-center justify-center'>
+            <div className='h-40 w-40 overflow-hidden flex items-center justify-center rounded-full ring-2 ring-black bg-gray-300 dark:bg-gray-800'>
+              {user?.image ? (
                 <Image
                   src={user?.image!}
                   alt={user?.username! || 'Profile'}
-                  width={1000}
-                  height={1000}
+                  width={160}
+                  height={160}
+                  className='object-cover h-full w-full'
                 />
               ) : (
-                <UserIcon className='w-30 h-30' />
+                <UserIcon className='w-30 h-30 text-gray-500' />
               )}
             </div>
           </div>
           {/* Details  */}
-          <div className='flex-1/3 flex flex-col gap-1 relative'>
-            <p className='font-bold capitalize'>
+          <div className='flex-1 flex flex-col gap-1 relative min-w-0'>
+            <p className='font-bold capitalize text-xl'>
               {user?.firstName} {user?.lastName}
-              <span className='text-xs font-light pl-4'>@{user.username} </span>
+              <span className='text-xs font-light pl-4 lowercase'>
+                @{user?.username}
+              </span>
             </p>
-            <p className='font-semibold capitalize text-sm'>{user?.role} </p>
-            <p className='flex text-sm gap-2 items-center'>
-              <Phone className='h-4 w-4' /> {user?.phone}
+            <p className='font-semibold capitalize text-sm text-blue-600'>
+              {user?.role}
             </p>
-            <p className='flex text-sm gap-2 items-center'>
-              <Mail className='h-4 w-4' /> {user?.email}
-            </p>
-            <p className='flex text-sm gap-2 items-center'>
-              <MapPin className='h-4 w-4' /> {user?.cell?.community.name}
-            </p>
-            <p className='flex text-sm gap-2 items-center'>
-              <Info className='h-4 w-4' /> {user?.about}
+            <div className='grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-1 mt-2'>
+              <p className='flex text-sm gap-2 items-center'>
+                <Phone className='h-3.5 w-3.5' /> {user?.phone}
+              </p>
+              <p className='flex text-sm gap-2 items-center'>
+                <Mail className='h-3.5 w-3.5' /> {user?.email}
+              </p>
+              <p className='flex text-sm gap-2 items-center'>
+                <MapPin className='h-3.5 w-3.5' />{' '}
+                {user?.zone?.name || 'No Community'}
+              </p>
+            </div>
+            <p className='flex text-sm gap-2 items-center mt-2'>
+              <Info className='h-4 w-4 shrink-0' />
+              <span className='line-clamp-2'>
+                {user?.about || 'No bio added yet.'}
+              </span>
             </p>
             <div className='flex items-center justify-end p-3'>
               <RightDrawer
                 trigger={
-                  <SquarePen className='h-4 w-4 hover:opacity-45 cursor-pointer transition-all duration-300 absolute top-2 right-2' />
+                  <SquarePen className='h-5 w-5 hover:text-blue-500 cursor-pointer transition-all duration-300 absolute top-0 right-0' />
                 }
                 title='Edit Profile'
                 description='Edit your profile details'
                 submitLabel='Save Changes'
                 formId='profile-edit'
+                open={isOpen === 'edit'}
+                onOpenChange={(open) => setIsOpen(open ? 'edit' : null)}
+                isLoading={updateProfile.isPending || updateAddress.isPending}
+                isSubmitDisabled={isSubmitDisabled}
               >
-                <UserForm user={user!} />
+                <UserForm
+                  user={user!}
+                  onSuccess={() => setIsOpen(null)}
+                  onValidationChange={(disabled) =>
+                    setIsSubmitDisabled(disabled)
+                  }
+                />
               </RightDrawer>
             </div>
           </div>
+
           {/* Certificates  */}
-          <div className='flex-1/3 w-full md:w-auto flex items-center justify-center'>
-            <div className='flex flex-col rounded-md bg-gray-300 dark:bg-gray-700 max-w-40 overflow-hidden'>
-              <div className=''>
-                <Image
-                  src='/assets/cert.png'
-                  alt='certificate'
-                  width={500}
-                  height={500}
-                  loading='eager'
-                  className='w-auto'
-                />
-              </div>
-              <div className=' flex p-2 justify-between items-center'>
-                <h2 className='font-semibold text-sm'>Growth Track</h2>
-                <div className='bg-blue-600 hover:bg-blue-400 hover:cursor-pointer rounded-full p-2'>
-                  <Download className='w-3 h-3 text-white' />
-                </div>
+          <div className='shrink-0 flex items-center justify-center'>
+            <div className='flex flex-col rounded-md bg-gray-300 dark:bg-gray-700 max-w-40 overflow-hidden shadow-md'>
+              {/* <div className=''> */}
+              <Image
+                src='/assets/cert.png'
+                alt='certificate'
+                width={200}
+                height={200}
+                className='w-full'
+                loading='eager'
+              />
+              {/* </div> */}
+              <div className='flex p-2 justify-between items-center bg-white dark:bg-gray-800'>
+                <h2 className='font-bold text-sm uppercase'>Growth Track</h2>
+                <Download className='w-3 h-3 text-blue-600' />
               </div>
             </div>
           </div>
         </section>
+
         {/* COURSES & ACTIVITIES  */}
-        <section className='grid grid-cols-2 lg:grid-cols-4 gap-4 justify-between mb-5'>
-          <div className='flex-1/4 flex justify-between rounded-lg bg-gray-200 dark:bg-gray-900'>
-            <p className='text-sm flex flex-col p-3 gap-3'>
-              Active Courses <span className=''>3</span>
-            </p>
-            <div className='border-l border-black dark:border-gray-600 p-2 flex items-center'>
-              <ChevronRight />
-            </div>
-          </div>
-          <div className='flex-1/4 flex justify-between rounded-lg bg-gray-200 dark:bg-gray-900'>
-            <p className='text-sm flex flex-col p-3 gap-3'>
-              Course Progress <span className=''>35%</span>
-            </p>
-            <div className='border-l border-black dark:border-gray-600 p-2 flex items-center'>
-              <ChevronRight />
-            </div>
-          </div>
-          <div className='flex-1/4 flex justify-between rounded-lg bg-gray-200 dark:bg-gray-900'>
-            <p className='text-sm flex flex-col p-3 gap-3'>
-              Completed Courses <span className=''>2</span>
-            </p>
-            <div className='border-l border-black dark:border-gray-600 p-2 flex items-center'>
-              <ChevronRight />
-            </div>
-          </div>
-          <div className='flex-1/4 flex justify-between rounded-lg bg-gray-200 dark:bg-gray-900'>
-            <p className='text-sm flex flex-col p-3 gap-3'>
-              Leadership Roles <span className=''>1</span>
-            </p>
-            <div className='border-l border-black dark:border-gray-600 p-2 flex items-center'>
-              <ChevronRight />
-            </div>
-          </div>
-        </section>
-        {/* SMALL GROUPS  */}
+        <CoursesnActivitiesSummary totalRoles={totalRoles} />
+
+        {/* DEPARTMENTS & SMALL GROUPS  */}
         <section className=''>
-          <h2 className='text-sm font-semibold py-3'>
+          <h2 className='text-sm font-bold uppercase text-gray-500 mb-4'>
             Departments and Small Groups
           </h2>
           <section className=''>
-            <section className='flex justify-between items-center rounded-lg bg-gray-200 dark:bg-gray-900 p-4 mb-2'>
-              <div className=''>
-                <p className='text-sm pb-3'>
-                  A Place Of Glory{' '}
-                  <span className='pl-5 font-semibold'>Cell</span>
-                </p>
-                <div className='flex flex-row items-center'>
-                  <GroupAvatar />
-                  <p className='text-xs pl-3'>members</p>
-                </div>
-              </div>
-              <div className='h-10 w-10 overflow-hidden rounded-full ring-3 ring-black dark:ring-gray-500'>
-                <Image
-                  src='/assets/logo.jpeg'
-                  alt='logo'
-                  width={1000}
-                  height={1000}
-                />
-              </div>
-            </section>
-            <section className='flex justify-between items-center rounded-lg bg-gray-200 dark:bg-gray-900 p-4 mb-2'>
-              <div className=''>
-                <p className='text-sm pb-3'>
-                  Growth Track{' '}
-                  <span className='pl-5 font-semibold'>Department</span>
-                </p>
-                <div className='flex flex-row items-center'>
-                  <GroupAvatar />
-                  <p className='text-xs pl-3'>members</p>
-                </div>
-              </div>
-              <div className='h-10 w-10 overflow-hidden rounded-full ring-3 ring-black dark:ring-gray-500'>
-                <Image
-                  src='/assets/logo.jpeg'
-                  alt='logo'
-                  width={1000}
-                  height={1000}
-                />
-              </div>
-            </section>
-            <section className='flex justify-between items-center rounded-lg bg-gray-200 dark:bg-gray-900 p-4 mb-2'>
-              <div className=''>
-                <p className='text-sm pb-3'>
-                  Tech Com{' '}
-                  <span className='pl-5 font-semibold'>Small Group</span>
-                </p>
-                <div className='flex flex-row items-center'>
-                  <GroupAvatar />
-                  <p className='text-xs pl-3'>members</p>
-                </div>
-              </div>
-              <div className='h-10 w-10 overflow-hidden rounded-full ring-3 ring-black dark:ring-gray-500'>
-                <Image
-                  src='/assets/logo.jpeg'
-                  alt='logo'
-                  width={1000}
-                  height={1000}
-                />
-              </div>
-            </section>
+            <DepartmentsNSmallGroups />
           </section>
         </section>
       </section>
+
       {/* RIGHT  */}
-      <section className='flex-1/3 p-4 lg:p-6 rounded-xl bg-gray-200 dark:bg-gray-900 lg:mt-6 mx-4 mb-5'>
-        <NextStepChart />
-        <section className='mt-4'>
-          <h2 className='font-bold mb-2'>Messages</h2>
-          <div className='flex flex-col gap-2'>
-            <div className=''>
-              <hr className='pb-1' />
-              <h3 className='text-sm font-semibold '>@PDolapo</h3>
-              <p className='text-xs font-light'>
-                Lorem ipsum dolor sit amet consectetur adipisicing elit. Ea sint
-                voluptatem amet quae vero ad <span>...</span>
-              </p>
-            </div>
-            <div className=''>
-              <hr className='pb-1' />
-              <h3 className='text-sm font-semibold '>@PDolapo</h3>
-              <p className='text-xs font-light'>
-                Lorem ipsum dolor sit amet consectetur adipisicing elit. Ea sint
-                voluptatem amet quae vero ad <span>...</span>
-              </p>
-            </div>
-            <div className=''>
-              <hr className='pb-1' />
-              <h3 className='text-sm font-semibold '>@PDolapo</h3>
-              <p className='text-xs font-light'>
-                Lorem ipsum dolor sit amet consectetur adipisicing elit. Ea sint
-                voluptatem amet quae vero ad <span>...</span>
-              </p>
-            </div>
+      {/* <section className='flex-1/3 p-4 lg:p-6 rounded-xl bg-gray-200 dark:bg-gray-900 lg:mt-6 mx-4 mb-5'> */}
+      <section className='w-full lg:w-1/3 p-4 lg:p-6'>
+        <div className='sticky top-6 flex flex-col gap-4'>
+          <div className='p-6 rounded-xl bg-gray-200 dark:bg-gray-900 border border-transparent hover:border-gray-300 dark:hover:border-gray-700 transition-colors'>
+            <NextStepChart />
+            <section className='mt-8'>
+              <div className='flex justify-between items-center mb-4'>
+                <h2 className='font-bold text-lg'>Messages</h2>
+                <span className='text-[10px] bg-blue-600 text-white px-2 py-0.5 rounded-full'>
+                  New
+                </span>
+              </div>
+
+              <div className='flex flex-col gap-4'>
+                {[1, 2, 3].map((_, i) => (
+                  <div key={i} className='group cursor-pointer'>
+                    <div className='flex justify-between items-center mb-1'>
+                      <h3 className='text-sm font-bold group-hover:text-blue-500 transition-colors'>
+                        @PDolapo
+                      </h3>
+                      <span className='text-[10px] opacity-50'>2h ago</span>
+                    </div>
+                    <p className='text-xs font-light text-gray-600 dark:text-gray-400 line-clamp-2'>
+                      Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                      Ea sint voluptatem...
+                    </p>
+                    {i !== 2 && (
+                      <hr className='mt-4 border-gray-300 dark:border-gray-800' />
+                    )}
+                  </div>
+                ))}
+              </div>
+              <div className='w-full flex items-center justify-center mt-6 gap-1'>
+                <Dot className='w-6 h-6 text-blue-600' />
+                <Dot className='w-6 h-6 text-gray-400' />
+                <Dot className='w-6 h-6 text-gray-400' />
+              </div>
+            </section>
           </div>
-          <div className='w-full flex items-center justify-end'>
-            <div className='flex gap-0.5 hover:cursor-pointer pr-3'>
-              <Dot className='w-3 h-3 text-white bg-gray-600 rounded-full' />
-              <Dot className='w-3 h-3 text-white bg-gray-600 rounded-full' />
-              <Dot className='w-3 h-3 text-white bg-gray-600 rounded-full' />
-            </div>
-          </div>
-        </section>
+        </div>
       </section>
     </section>
   )

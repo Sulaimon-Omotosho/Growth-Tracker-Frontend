@@ -1,7 +1,7 @@
 'use client'
 
 import { zodResolver } from '@hookform/resolvers/zod'
-import { CommunitySchema, District, User } from '@repo/types'
+import { CommunitySchema } from '@repo/types'
 import { Controller, useForm } from 'react-hook-form'
 import z from 'zod'
 import {
@@ -9,24 +9,21 @@ import {
   FieldError,
   FieldGroup,
   FieldLabel,
-  FieldLegend,
-  FieldSeparator,
-  FieldSet,
 } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
-import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
-import { toast } from 'sonner'
 import { useDebounce } from '@/hooks/use-utils'
-import {
-  useCreateCommunity,
-  useSearchDistrict,
-  useSearchUsers,
-} from '@/hooks/use-church'
+import { useCheckCommName, useSearchDistrict } from '@/hooks/use-church'
+import { useSearchUsers } from '@/hooks/use-user'
+import { AddFormProps } from './AddTeam'
 
 type CommunityFormValues = z.output<typeof CommunitySchema>
 
-const AddCommunity = () => {
+const AddCommunity = ({
+  onSuccess,
+  mutation,
+  onValidationChange,
+}: AddFormProps) => {
   const [userSearch, setUserSearch] = useState('')
   const [districtSearch, setDistrictSearch] = useState('')
 
@@ -41,6 +38,41 @@ const AddCommunity = () => {
       districtId: '',
     },
   })
+  const {
+    formState: { isValid },
+  } = form
+
+  //Availability
+  const checkName = useCheckCommName()
+  const selectedDistrict = form.watch('districtId')
+  const currentName = form.watch('name')
+  const handleNameBlur = async (name: string) => {
+    const districtId = form.getValues('districtId')
+
+    if (!name || !districtId || name.length < 3) return
+    const result = await checkName.mutateAsync({ name, districtId })
+
+    if (!result.available) {
+      form.setError('name', {
+        type: 'manual',
+        message: 'This community name is already taken in this district.',
+      })
+    } else {
+      form.clearErrors('name')
+    }
+  }
+
+  // Effects
+  useEffect(() => {
+    const isInvalid = !isValid || checkName.isPending
+    onValidationChange?.(isInvalid)
+  }, [isValid, checkName.isPending, onValidationChange])
+
+  useEffect(() => {
+    if (currentName && selectedDistrict) {
+      handleNameBlur(currentName)
+    }
+  }, [selectedDistrict])
 
   // Queries
   const { data: users, isFetching: isUsersLoading } =
@@ -48,16 +80,14 @@ const AddCommunity = () => {
   const { data: districts, isFetching: isDistrictsLoading } = useSearchDistrict(
     debouncedDistrictSearch,
   )
-  const createCommunity = useCreateCommunity()
 
   const onSubmit = (data: CommunityFormValues) => {
-    console.log('Community Form', data)
-
-    createCommunity.mutate(data, {
+    mutation.mutate(data, {
       onSuccess: () => {
         form.reset()
         setUserSearch('')
         setDistrictSearch('')
+        onSuccess?.()
       },
     })
   }
@@ -71,8 +101,18 @@ const AddCommunity = () => {
             control={form.control}
             render={({ field, fieldState }) => (
               <Field data-invalid={fieldState.invalid}>
-                <FieldLabel htmlFor='name'>Community Name</FieldLabel>
-                <Input {...field} id='name' aria-invalid={fieldState.invalid} />
+                <FieldLabel htmlFor='name'>
+                  Community Name {checkName.isPending && ' (Checking...)'}
+                </FieldLabel>
+                <Input
+                  {...field}
+                  id='name'
+                  aria-invalid={fieldState.invalid}
+                  onBlur={(e) => {
+                    field.onBlur()
+                    handleNameBlur(e.target.value)
+                  }}
+                />
                 {fieldState.invalid && (
                   <FieldError errors={[fieldState.error]} />
                 )}
@@ -83,7 +123,7 @@ const AddCommunity = () => {
             name='leaderId'
             control={form.control}
             render={({ field, fieldState }) => (
-              <Field data-invalid={fieldState.invalid}>
+              <Field className='relative' data-invalid={fieldState.invalid}>
                 <FieldLabel htmlFor='leaderId'>Pastor</FieldLabel>
                 <Input
                   placeholder='Search Pastor...'
@@ -96,7 +136,7 @@ const AddCommunity = () => {
                 />
 
                 {!field.value && userSearch.length > 2 && (
-                  <div className='mt-2 rounded border bg-background max-h-48 overflow-y-auto'>
+                  <div className='mt-18 rounded border bg-popover shadow-md max-h-40 overflow-auto absolute z-10 w-full'>
                     {isUsersLoading && (
                       <p className='p-2 text-sm text-muted-foreground'>
                         Searching...
@@ -110,8 +150,6 @@ const AddCommunity = () => {
                     )}
 
                     {users?.map((u) => {
-                      // const fullName = `${user.firstName} ${user.lastName}`
-
                       return (
                         <button
                           key={u.id}
@@ -120,13 +158,9 @@ const AddCommunity = () => {
                           onClick={() => {
                             field.onChange(u.id)
                             setUserSearch(`${u.firstName} ${u.lastName}`)
-                            // setSelectedUser(user)
-                            // setUsers([])
                           }}
                         >
                           {u.firstName} {u.lastName}
-                          {/* <p className='font-medium'>
-                            </p> */}
                         </button>
                       )
                     })}
@@ -141,7 +175,7 @@ const AddCommunity = () => {
             name='districtId'
             control={form.control}
             render={({ field, fieldState }) => (
-              <Field data-invalid={fieldState.invalid}>
+              <Field className='relative' data-invalid={fieldState.invalid}>
                 <FieldLabel htmlFor='districtId'>District</FieldLabel>
                 <Input
                   placeholder='Search District...'
@@ -153,7 +187,7 @@ const AddCommunity = () => {
                 />
 
                 {!field.value && districtSearch.length > 2 && (
-                  <div className='mt-2 rounded border bg-background max-h-48 overflow-y-auto'>
+                  <div className='mt-18 rounded border bg-popover shadow-md max-h-40 overflow-auto absolute z-10 w-full'>
                     {isDistrictsLoading && (
                       <p className='p-2 text-sm text-muted-foreground'>
                         Searching...
@@ -179,8 +213,6 @@ const AddCommunity = () => {
                           onClick={() => {
                             field.onChange(d.id)
                             setDistrictSearch(d.name)
-                            // setSelectedDistrict(district)
-                            // setDistricts([])
                           }}
                         >
                           <p className='font-medium capitalize'>{d.name}</p>

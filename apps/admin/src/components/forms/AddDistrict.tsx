@@ -1,45 +1,31 @@
 'use client'
 
 import { zodResolver } from '@hookform/resolvers/zod'
-import { DistrictSchema, User, UserFormSchema } from '@repo/types'
+import { DistrictSchema } from '@repo/types'
 import { Controller, useForm } from 'react-hook-form'
 import z from 'zod'
 
-import { Button } from '@/components/ui/button'
-import { Checkbox } from '@/components/ui/checkbox'
 import {
   Field,
-  FieldContent,
-  FieldDescription,
   FieldError,
   FieldGroup,
   FieldLabel,
-  FieldLegend,
-  FieldSeparator,
-  FieldSet,
 } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
-import { Textarea } from '@/components/ui/textarea'
-import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
-import { toast } from 'sonner'
 import { useDebounce } from '@/hooks/use-utils'
-import { UserSearch } from 'lucide-react'
-import { useCreateDistrict, useSearchUsers } from '@/hooks/use-church'
+import { useCheckDistName, useCreateDistrict } from '@/hooks/use-church'
+import { useSearchUsers } from '@/hooks/use-user'
+import { AddFormProps } from './AddTeam'
 
 type DistrictFormValues = z.output<typeof DistrictSchema>
 
-const AddDistrict = () => {
+const AddDistrict = ({
+  onSuccess,
+  mutation,
+  onValidationChange,
+}: AddFormProps) => {
   const [userSearch, setUserSearch] = useState('')
-
   const debouncedUserSearch = useDebounce(userSearch, 400)
 
   const form = useForm<z.input<typeof DistrictSchema>>({
@@ -49,18 +35,41 @@ const AddDistrict = () => {
       leaderId: '',
     },
   })
+  const {
+    formState: { isValid },
+  } = form
 
   const { data: users, isFetching: isUsersLoading } =
     useSearchUsers(debouncedUserSearch)
-  const createDistrict = useCreateDistrict()
 
-  async function onSubmit(data: DistrictFormValues) {
-    console.log('District Form', data)
+  // Availability
+  const checkName = useCheckDistName()
+  const handleNameBlur = async (name: string) => {
+    if (!name || name.length < 3) return
+    const result = await checkName.mutateAsync(name)
 
-    createDistrict.mutate(data, {
+    if (!result.available) {
+      form.setError('name', {
+        type: 'manual',
+        message: 'This district name is already taken.',
+      })
+    } else {
+      form.clearErrors('name')
+    }
+  }
+
+  // Effects
+  useEffect(() => {
+    const isInvalid = !isValid || checkName.isPending
+    onValidationChange?.(isInvalid)
+  }, [isValid, checkName.isPending, onValidationChange])
+
+  const onSubmit = (data: DistrictFormValues) => {
+    mutation.mutate(data, {
       onSuccess: () => {
         form.reset()
         setUserSearch('')
+        onSuccess?.()
       },
     })
   }
@@ -74,12 +83,17 @@ const AddDistrict = () => {
             control={form.control}
             render={({ field, fieldState }) => (
               <Field data-invalid={fieldState.invalid}>
-                <FieldLabel htmlFor='name'>District Name</FieldLabel>
+                <FieldLabel htmlFor='name'>
+                  District Name {checkName.isPending && ' (Checking...)'}
+                </FieldLabel>
                 <Input
                   {...field}
                   id='name'
                   aria-invalid={fieldState.invalid}
-                  // placeholder='John'
+                  onBlur={(e) => {
+                    field.onBlur()
+                    handleNameBlur(e.target.value)
+                  }}
                 />
                 {fieldState.invalid && (
                   <FieldError errors={[fieldState.error]} />
@@ -91,7 +105,7 @@ const AddDistrict = () => {
             name='leaderId'
             control={form.control}
             render={({ field, fieldState }) => (
-              <Field data-invalid={fieldState.invalid}>
+              <Field className='relative' data-invalid={fieldState.invalid}>
                 <FieldLabel htmlFor='leaderId'>Pastor</FieldLabel>
 
                 <Input
@@ -105,7 +119,7 @@ const AddDistrict = () => {
                 />
 
                 {!field.value && userSearch.length > 2 && (
-                  <div className='mt-2 rounded border bg-background max-h-48 overflow-y-auto'>
+                  <div className='mt-18 rounded border bg-popover shadow-md max-h-40 overflow-auto absolute z-10 w-full'>
                     {isUsersLoading && (
                       <p className='p-2 text-sm text-muted-foreground'>
                         Searching...

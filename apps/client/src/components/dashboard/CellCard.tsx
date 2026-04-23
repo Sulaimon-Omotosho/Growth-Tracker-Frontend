@@ -4,9 +4,13 @@ import Image from 'next/image'
 import React, { useRef } from 'react'
 import { Input } from '../ui/input'
 import { Textarea } from '../ui/textarea'
+import { User } from '@repo/types'
+import { getNextMeetingDate } from '@/lib/utils'
 
-const CellCard = () => {
+const CellCard = ({ user }: any) => {
   const textareaRef = useRef<HTMLTextAreaElement>(null)
+  const nextMeeting = getNextMeetingDate()
+  console.log('Cell Card:', user)
 
   const autoResize = () => {
     const el = textareaRef.current
@@ -14,11 +18,24 @@ const CellCard = () => {
     el.style.height = 'auto'
     el.style.height = el.scrollHeight + 'px'
   }
+
+  if (!user?.cell) {
+    return (
+      <div className='px-4 py-8 mt-4 border border-dashed rounded-md text-center text-muted-foreground'>
+        <p className='text-sm'>You haven't joined a cell yet.</p>
+      </div>
+    )
+  }
+
+  const leaderName = user.cell.leader
+    ? `${user.cell.leader.firstName} ${user.cell.leader.lastName}`
+    : 'No Leader Assigned'
+
   return (
     <div className='px-4 py-4 lg:py-2 mt-4 outline-1 rounded-md shadow-sm'>
       {/* HEAD  */}
       <div className='flex items-center justify-between px-5'>
-        <h2 className='font-bold text-lg'>APG 4</h2>
+        <h2 className='font-bold text-lg'>{user.cell.name}</h2>
         <Image
           src='/assets/logo.jpeg'
           alt='logo'
@@ -31,11 +48,11 @@ const CellCard = () => {
       <div className='flex flex-col gap-1'>
         <div className='flex justify-between'>
           <p className='font-semibold'>Cell Leader</p>
-          <span className=''>Sulaimon Omotosho</span>
+          <span className=''>{leaderName}</span>
         </div>
         <div className='flex justify-between'>
           <p className='font-semibold'>Next Meeting</p>
-          <span className=''>Sunday, 24.12.2026</span>
+          <span className=''>{nextMeeting}</span>
         </div>
         <div className='flex flex-col'>
           <div className='flex items-center justify-between pb-2'>

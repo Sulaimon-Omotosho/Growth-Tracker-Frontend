@@ -19,21 +19,24 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { useState } from 'react'
-import { Trash2 } from 'lucide-react'
+import { Loader2, Trash2 } from 'lucide-react'
 import { DataTablePagination } from '@/components/dashboard/TablePagination'
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
   data: TData[]
+  onDelete?: (ids: string[]) => void
+  isDeleting?: boolean
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
+  onDelete,
+  isDeleting = false,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([])
   const [rowSelection, setRowSelection] = useState({})
-  // console.log('data:', data)
 
   const table = useReactTable({
     data,
@@ -49,17 +52,33 @@ export function DataTable<TData, TValue>({
     },
   })
 
-  // console.log('table:', table)
+  const handleDelete = () => {
+    const selectedRows = table.getFilteredSelectedRowModel().rows
+    const ids = selectedRows.map((row) => (row.original as any).id)
+
+    if (onDelete) {
+      onDelete(ids)
+      setRowSelection({})
+    }
+  }
+
   return (
     <div className='rounded-md border'>
       {Object.keys(rowSelection).length > 0 && (
         <div className='flex justify-end'>
           <button
-            className='flex items-center
-         bg-red-500 text-white text-sm px-2 py-1 rounded-md m-4 cursor-pointer '
+            onClick={handleDelete}
+            disabled={isDeleting}
+            className='flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white text-sm px-3 py-1.5 rounded-md cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed'
           >
-            <Trash2 className='w-4 h-4' />
-            Delete Team(s)
+            {isDeleting ? (
+              <Loader2 className='w-4 h-4 animate-spin' />
+            ) : (
+              <Trash2 className='w-4 h-4' />
+            )}
+            {isDeleting
+              ? 'Deleting...'
+              : `Delete Selected (${Object.keys(rowSelection).length})`}
           </button>
         </div>
       )}

@@ -1,470 +1,87 @@
-import React from 'react'
+'use client'
+
+import React, { useState } from 'react'
 import { DataTable } from './data-table'
 import { columns } from './columns'
-
-//   const getData = async (): Promise<ProductsType> => {
-
-//   try {
-//     const res = await fetch(
-//       `${process.env.NEXT_PUBLIC_PRODUCT_SERVICE_URL}/products`,
-//     )
-//     const data = await res.json()
-//     return data
-//   } catch (error) {
-//     console.log(error)
-//     return []
-//   }
-// }
-export const teams = [
-  {
-    id: 'team-001',
-    name: 'Faith Builders',
-    pastor: 'Pastor Daniel Adebayo',
-    departments: [
-      'Media',
-      'Ushering',
-      'Choir',
-      'Prayer',
-      'Children Ministry',
-      'Protocol',
-      'Evangelism',
-      'Technical',
-    ],
-    departmentCount: 8,
-    membersCount: 145,
-    location: 'Main Auditorium',
-    status: 'ACTIVE',
-    description:
-      'A foundational team focused on building strong faith and spiritual growth across all departments.',
-    createdAt: '2024-01-15',
-  },
-  {
-    id: 'team-002',
-    name: 'Kingdom Ambassadors',
-    pastor: 'Pastor Grace Okonkwo',
-    departments: [
-      'Evangelism',
-      'Follow-up',
-      'Media',
-      'Ushering',
-      'Welfare',
-      'Prayer',
-      'Logistics',
-      'Security',
-    ],
-    departmentCount: 8,
-    membersCount: 132,
-    location: 'Outreach Center',
-    status: 'ACTIVE',
-    description:
-      'Dedicated to outreach programs and spreading the gospel within and outside the city.',
-    createdAt: '2024-02-02',
-  },
-  {
-    id: 'team-003',
-    name: 'Light Bearers',
-    pastor: 'Pastor Samuel Ojo',
-    departments: [
-      'Media',
-      'Technical',
-      'Sound',
-      'Protocol',
-      'Security',
-      'Prayer',
-      'Ushering',
-      'Logistics',
-    ],
-    departmentCount: 8,
-    membersCount: 118,
-    location: 'Media Wing',
-    status: 'ACTIVE',
-    description:
-      'Handles all technical and media responsibilities to ensure seamless services.',
-    createdAt: '2023-11-20',
-  },
-  {
-    id: 'team-004',
-    name: 'Harvest Workers',
-    pastor: 'Pastor Ruth Balogun',
-    departments: [
-      'Evangelism',
-      'Follow-up',
-      'Prayer',
-      'Welfare',
-      'Counseling',
-      'Ushering',
-      'Media',
-      'Logistics',
-    ],
-    departmentCount: 8,
-    membersCount: 160,
-    location: 'Mission Hall',
-    status: 'ACTIVE',
-    description:
-      'Focused on soul winning, counseling, and nurturing new converts.',
-    createdAt: '2024-03-10',
-  },
-  {
-    id: 'team-005',
-    name: 'Royal Priests',
-    pastor: 'Pastor Elijah Martins',
-    departments: [
-      'Choir',
-      'Music',
-      'Sound',
-      'Media',
-      'Prayer',
-      'Technical',
-      'Protocol',
-      'Ushering',
-    ],
-    departmentCount: 8,
-    membersCount: 95,
-    location: 'Music Studio',
-    status: 'ACTIVE',
-    description:
-      'Responsible for worship, praise, and musical excellence during services.',
-    createdAt: '2023-10-05',
-  },
-  {
-    id: 'team-006',
-    name: 'Watchmen',
-    pastor: 'Pastor Michael Ade',
-    departments: [
-      'Prayer',
-      'Intercession',
-      'Night Watch',
-      'Counseling',
-      'Welfare',
-      'Ushering',
-      'Media',
-      'Logistics',
-    ],
-    departmentCount: 8,
-    membersCount: 110,
-    location: 'Prayer Room',
-    status: 'ACTIVE',
-    description:
-      'An intercessory team committed to prayer and spiritual covering of the church.',
-    createdAt: '2024-01-28',
-  },
-  {
-    id: 'team-007',
-    name: 'Living Stones',
-    pastor: 'Pastor Deborah Hassan',
-    departments: [
-      'Construction',
-      'Maintenance',
-      'Technical',
-      'Logistics',
-      'Security',
-      'Media',
-      'Welfare',
-      'Protocol',
-    ],
-    departmentCount: 8,
-    membersCount: 84,
-    location: 'Facility Unit',
-    status: 'ACTIVE',
-    description:
-      'Handles church facilities, maintenance, and structural development.',
-    createdAt: '2023-09-12',
-  },
-  {
-    id: 'team-008',
-    name: 'Covenant Keepers',
-    pastor: 'Pastor Joseph Nwankwo',
-    departments: [
-      'Men Fellowship',
-      'Prayer',
-      'Counseling',
-      'Media',
-      'Evangelism',
-      'Ushering',
-      'Protocol',
-      'Welfare',
-    ],
-    departmentCount: 8,
-    membersCount: 102,
-    location: 'Men Fellowship Hall',
-    status: 'ACTIVE',
-    description:
-      'A men-focused team promoting leadership, discipline, and spiritual growth.',
-    createdAt: '2024-02-18',
-  },
-  {
-    id: 'team-009',
-    name: 'Virtuous Women',
-    pastor: 'Pastor Esther Bello',
-    departments: [
-      'Women Fellowship',
-      'Counseling',
-      'Prayer',
-      'Welfare',
-      'Children Ministry',
-      'Media',
-      'Ushering',
-      'Protocol',
-    ],
-    departmentCount: 8,
-    membersCount: 170,
-    location: 'Women Fellowship Hall',
-    status: 'ACTIVE',
-    description:
-      'Empowers women in faith, family life, and ministry involvement.',
-    createdAt: '2023-08-01',
-  },
-  {
-    id: 'team-010',
-    name: 'Rising Generation',
-    pastor: 'Pastor Joshua Danjuma',
-    departments: [
-      'Youth Ministry',
-      'Media',
-      'Technical',
-      'Drama',
-      'Music',
-      'Evangelism',
-      'Prayer',
-      'Ushering',
-    ],
-    departmentCount: 8,
-    membersCount: 210,
-    location: 'Youth Center',
-    status: 'ACTIVE',
-    description:
-      'Focused on youth engagement, creativity, and leadership development.',
-    createdAt: '2024-04-05',
-  },
-
-  // ---------- 10 MORE ----------
-  {
-    id: 'team-011',
-    name: 'Peace Makers',
-    pastor: 'Pastor Emmanuel Lawal',
-    departments: [
-      'Counseling',
-      'Conflict Resolution',
-      'Prayer',
-      'Welfare',
-      'Media',
-      'Protocol',
-      'Ushering',
-      'Follow-up',
-    ],
-    departmentCount: 8,
-    membersCount: 76,
-    location: 'Counseling Unit',
-    status: 'ACTIVE',
-    description:
-      'Specialized in counseling, mediation, and restoring relationships.',
-    createdAt: '2023-07-15',
-  },
-  {
-    id: 'team-012',
-    name: 'Good Stewards',
-    pastor: 'Pastor Paul Adeniyi',
-    departments: [
-      'Finance',
-      'Accounts',
-      'Audit',
-      'Welfare',
-      'Media',
-      'Protocol',
-      'Logistics',
-      'Administration',
-    ],
-    departmentCount: 8,
-    membersCount: 64,
-    location: 'Admin Office',
-    status: 'ACTIVE',
-    description:
-      'Manages finances, accountability, and administrative operations.',
-    createdAt: '2023-06-20',
-  },
-  {
-    id: 'team-013',
-    name: 'Gate Keepers',
-    pastor: 'Pastor Ibrahim Musa',
-    departments: [
-      'Security',
-      'Protocol',
-      'Traffic Control',
-      'Logistics',
-      'Media',
-      'Ushering',
-      'Welfare',
-      'Prayer',
-    ],
-    departmentCount: 8,
-    membersCount: 90,
-    location: 'Main Entrance',
-    status: 'ACTIVE',
-    description:
-      'Ensures order, safety, and smooth movement during church programs.',
-    createdAt: '2024-01-08',
-  },
-  {
-    id: 'team-014',
-    name: 'Helping Hands',
-    pastor: 'Pastor Comfort Adebola',
-    departments: [
-      'Welfare',
-      'Outreach',
-      'Medical',
-      'Counseling',
-      'Prayer',
-      'Media',
-      'Logistics',
-      'Children Ministry',
-    ],
-    departmentCount: 8,
-    membersCount: 125,
-    location: 'Welfare Unit',
-    status: 'ACTIVE',
-    description:
-      'Focused on care, medical aid, and community support initiatives.',
-    createdAt: '2024-03-22',
-  },
-  {
-    id: 'team-015',
-    name: 'Voice of Triumph',
-    pastor: 'Pastor Nathaniel King',
-    departments: [
-      'Choir',
-      'Music',
-      'Sound',
-      'Media',
-      'Prayer',
-      'Technical',
-      'Protocol',
-      'Ushering',
-    ],
-    departmentCount: 8,
-    membersCount: 88,
-    location: 'Choir Stand',
-    status: 'ACTIVE',
-    description: 'Delivers powerful worship and praise experiences.',
-    createdAt: '2023-05-30',
-  },
-  {
-    id: 'team-016',
-    name: 'Hope Restorers',
-    pastor: 'Pastor Lydia Akinwale',
-    departments: [
-      'Counseling',
-      'Prayer',
-      'Follow-up',
-      'Welfare',
-      'Evangelism',
-      'Media',
-      'Ushering',
-      'Protocol',
-    ],
-    departmentCount: 8,
-    membersCount: 99,
-    location: 'Hope Center',
-    status: 'ACTIVE',
-    description:
-      'Restores hope through counseling, prayer, and follow-up care.',
-    createdAt: '2024-02-11',
-  },
-  {
-    id: 'team-017',
-    name: 'Cornerstone',
-    pastor: 'Pastor Victor Adebisi',
-    departments: [
-      'Teaching',
-      'Bible Study',
-      'Prayer',
-      'Media',
-      'Counseling',
-      'Administration',
-      'Ushering',
-      'Protocol',
-    ],
-    departmentCount: 8,
-    membersCount: 73,
-    location: 'Bible School',
-    status: 'ACTIVE',
-    description: 'Dedicated to teaching sound doctrine and spiritual maturity.',
-    createdAt: '2023-04-18',
-  },
-  {
-    id: 'team-018',
-    name: 'True Vine',
-    pastor: 'Pastor Hannah Williams',
-    departments: [
-      'Discipleship',
-      'Prayer',
-      'Follow-up',
-      'Media',
-      'Evangelism',
-      'Counseling',
-      'Ushering',
-      'Welfare',
-    ],
-    departmentCount: 8,
-    membersCount: 112,
-    location: 'Discipleship Center',
-    status: 'ACTIVE',
-    description: 'Focuses on discipleship and spiritual fruitfulness.',
-    createdAt: '2023-12-02',
-  },
-  {
-    id: 'team-019',
-    name: 'Builders Network',
-    pastor: 'Pastor Andrew Collins',
-    departments: [
-      'Technical',
-      'Construction',
-      'Maintenance',
-      'Logistics',
-      'Media',
-      'Security',
-      'Protocol',
-      'Administration',
-    ],
-    departmentCount: 8,
-    membersCount: 69,
-    location: 'Development Office',
-    status: 'ACTIVE',
-    description: 'Supports infrastructure growth and technical development.',
-    createdAt: '2024-01-03',
-  },
-  {
-    id: 'team-020',
-    name: 'Flame Carriers',
-    pastor: 'Pastor Zion Okafor',
-    departments: [
-      'Youth Ministry',
-      'Evangelism',
-      'Drama',
-      'Media',
-      'Music',
-      'Prayer',
-      'Ushering',
-      'Technical',
-    ],
-    departmentCount: 8,
-    membersCount: 190,
-    location: 'Youth Arena',
-    status: 'ACTIVE',
-    description:
-      'A vibrant youth-driven team passionate about revival and evangelism.',
-    createdAt: '2024-04-12',
-  },
-]
+import { SkeletonTable } from '@/components/Skeleton'
+import { useGetTeams } from '@/hooks/get-church'
+import { useDeleteTeams } from '@/hooks/use-church'
+import { Plus, Search, Users2 } from 'lucide-react'
+import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
+import { Teams } from '@repo/types'
 
 const WorkForce = () => {
-  const data = teams as any
-  // const data = await getData()
-  return (
-    <div className=''>
-      <div className='mb-8 px-4 py-2 bg-secondary rounded-md'>
-        <h1 className='font-semibold'>All Teams</h1>
+  const { data, isLoading, isError } = useGetTeams()
+  const deleteTeams = useDeleteTeams()
+  const [searchQuery, setSearchQuery] = useState('')
+
+  const handleDelete = (ids: string[]) => {
+    if (window.confirm(`Delete ${ids.length} item(s)?`)) {
+      deleteTeams.mutate(ids)
+    }
+  }
+
+  // Filter logic
+  const filteredData =
+    data?.filter((team: Teams) =>
+      team.name.toLowerCase().includes(searchQuery.toLowerCase()),
+    ) ?? []
+
+  if (isLoading)
+    return (
+      <div className='p-8'>
+        <SkeletonTable />
       </div>
-      <DataTable columns={columns} data={data} />
+    )
+
+  return (
+    <div className='p-6 space-y-6'>
+      {/* HEADER SECTION */}
+      <div className='flex flex-col md:flex-row md:items-center justify-between gap-4'>
+        <div>
+          <p className='text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400'>
+            Management
+          </p>
+          <h1 className='text-2xl font-black tracking-tight text-zinc-900 dark:text-zinc-100 flex items-center gap-2'>
+            Workforce Directory{' '}
+            <span className='text-xs font-medium text-zinc-400 bg-zinc-100 dark:bg-zinc-900 px-2 py-0.5 rounded-full'>
+              {data?.length || 0}
+            </span>
+          </h1>
+        </div>
+        <Button className='bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 font-bold hover:opacity-90'>
+          <Plus size={16} className='mr-2' /> Create New Team
+        </Button>
+      </div>
+
+      {/* SEARCH & FILTERS BAR */}
+      <div className='flex items-center gap-4 bg-white dark:bg-zinc-950 p-4 border border-zinc-100 dark:border-zinc-900 rounded-xl'>
+        <div className='relative flex-1 max-w-sm'>
+          <Search
+            className='absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400'
+            size={16}
+          />
+          <Input
+            placeholder='Search teams...'
+            className='pl-10 bg-zinc-50 dark:bg-zinc-900 border-none'
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+        </div>
+        <div className='hidden sm:flex gap-2'>
+          {/* Optional: Add status filters here */}
+        </div>
+      </div>
+
+      {/* THE TABLE */}
+      <div className='bg-white dark:bg-zinc-950 border border-zinc-100 dark:border-zinc-900 rounded-2xl overflow-hidden'>
+        <DataTable
+          columns={columns}
+          data={filteredData}
+          onDelete={handleDelete}
+        />
+      </div>
     </div>
   )
 }

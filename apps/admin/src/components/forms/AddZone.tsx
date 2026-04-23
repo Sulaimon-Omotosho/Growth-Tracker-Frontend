@@ -1,7 +1,7 @@
 'use client'
 
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Community, User, ZoneSchema } from '@repo/types'
+import { ZoneSchema } from '@repo/types'
 import { Controller, useForm } from 'react-hook-form'
 import z from 'zod'
 import {
@@ -11,19 +11,15 @@ import {
   FieldLabel,
 } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
-import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
-import { toast } from 'sonner'
 import { useDebounce } from '@/hooks/use-utils'
-import {
-  useCreateZone,
-  useSearchCommunities,
-  useSearchUsers,
-} from '@/hooks/use-church'
+import { useCheckZoneName, useSearchCommunities } from '@/hooks/use-church'
+import { useSearchUsers } from '@/hooks/use-user'
+import { AddFormProps } from './AddTeam'
 
 type ZoneFormValues = z.output<typeof ZoneSchema>
 
-const AddZone = () => {
+const AddZone = ({ onSuccess, mutation, onValidationChange }: AddFormProps) => {
   const [userSearch, setUserSearch] = useState('')
   const [communitySearch, setCommunitySearch] = useState('')
 
@@ -38,21 +34,54 @@ const AddZone = () => {
       communityId: '',
     },
   })
+  const {
+    formState: { isValid },
+  } = form
+
+  //Availability
+  const checkName = useCheckZoneName()
+  const selectedCommunity = form.watch('communityId')
+  const currentName = form.watch('name')
+  const handleNameBlur = async (name: string) => {
+    const communityId = form.getValues('communityId')
+
+    if (!name || !communityId || name.length < 3) return
+    const result = await checkName.mutateAsync({ name, communityId })
+
+    if (!result.available) {
+      form.setError('name', {
+        type: 'manual',
+        message: 'This Zone name is already taken in this community.',
+      })
+    } else {
+      form.clearErrors('name')
+    }
+  }
+
+  // Effects
+  useEffect(() => {
+    const isInvalid = !isValid || checkName.isPending
+    onValidationChange?.(isInvalid)
+  }, [isValid, checkName.isPending, onValidationChange])
+
+  useEffect(() => {
+    if (currentName && selectedCommunity) {
+      handleNameBlur(currentName)
+    }
+  }, [selectedCommunity])
 
   const { data: users, isFetching: isUsersLoading } =
     useSearchUsers(debouncedUserSearch)
   const { data: communities, isFetching: isCommunityLoading } =
     useSearchCommunities(debouncedCommunitySearch)
-  const createZone = useCreateZone()
 
   const onSubmit = (data: ZoneFormValues) => {
-    console.log('Zone Form', data)
-
-    createZone.mutate(data, {
+    mutation.mutate(data, {
       onSuccess: () => {
         form.reset()
         setUserSearch('')
         setCommunitySearch('')
+        onSuccess?.()
       },
     })
   }
@@ -66,8 +95,18 @@ const AddZone = () => {
             control={form.control}
             render={({ field, fieldState }) => (
               <Field data-invalid={fieldState.invalid}>
-                <FieldLabel htmlFor='name'>Zone Name</FieldLabel>
-                <Input {...field} id='name' aria-invalid={fieldState.invalid} />
+                <FieldLabel htmlFor='name'>
+                  Zone Name {checkName.isPending && ' (Checking...)'}
+                </FieldLabel>
+                <Input
+                  {...field}
+                  id='name'
+                  aria-invalid={fieldState.invalid}
+                  onBlur={(e) => {
+                    field.onBlur()
+                    handleNameBlur(e.target.value)
+                  }}
+                />
                 {fieldState.invalid && (
                   <FieldError errors={[fieldState.error]} />
                 )}
@@ -90,7 +129,7 @@ const AddZone = () => {
                 />
 
                 {!field.value && userSearch.length > 2 && (
-                  <div className='mt-2 rounded border bg-popover shadow-md max-h-40 overflow-auto absolute z-10 w-full'>
+                  <div className='mt-18 rounded border bg-popover shadow-md max-h-40 overflow-auto absolute z-10 w-full'>
                     {isUsersLoading && (
                       <p className='p-2 text-sm text-muted-foreground'>
                         Searching...
@@ -142,7 +181,7 @@ const AddZone = () => {
                 />
 
                 {!field.value && communitySearch.length > 2 && (
-                  <div className='mt-2 rounded border bg-popover shadow-md max-h-40 overflow-auto absolute z-20 w-full'>
+                  <div className='mt-18 rounded border bg-popover shadow-md max-h-40 overflow-auto absolute z-20 w-full'>
                     {isCommunityLoading && (
                       <p className='p-2 text-sm text-muted-foreground'>
                         Searching...

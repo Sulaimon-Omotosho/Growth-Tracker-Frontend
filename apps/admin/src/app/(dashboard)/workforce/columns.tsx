@@ -10,12 +10,9 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { cn } from '@/lib/utils'
 import { Teams } from '@repo/types'
-// import { ProductType } from '@repo/types'
 import { ColumnDef } from '@tanstack/react-table'
-import { ArrowUpDown, MoreHorizontal } from 'lucide-react'
-import Image from 'next/image'
+import { ArrowUpDown, MoreHorizontal, Users2 } from 'lucide-react'
 import Link from 'next/link'
 
 export const columns: ColumnDef<Teams>[] = [
@@ -37,47 +34,46 @@ export const columns: ColumnDef<Teams>[] = [
       />
     ),
   },
-  // {
-  //   accessorKey: 'name',
-  //   header: 'Team',
-  //   cell: ({ row }) => {
-  //     const product = row.original
-  //     return (
-  //       <div className='w-9 h-9 relative'>
-  //         <Image
-  //           src={
-  //             (product.images as Record<string, string>)?.[
-  //               product.colors[0] || ''
-  //             ] || ''
-  //           }
-  //           alt={product.name}
-  //           fill
-  //           className='rounded-full object-cover'
-  //         />
-  //       </div>
-  //     )
-  //   },
-  // },
-  { accessorKey: 'name', header: 'Team' },
   {
-    accessorKey: 'pastor',
-    header: 'Pastor',
+    accessorKey: 'name',
+    header: 'Team',
+    cell: ({ row }) => (
+      <div className='flex items-center gap-3'>
+        <div className='h-8 w-8 rounded-lg bg-zinc-100 dark:bg-zinc-900 flex items-center justify-center text-zinc-500'>
+          <Users2 size={14} />
+        </div>
+        <span className='font-bold text-zinc-900 dark:text-zinc-100'>
+          {row.getValue('name')}
+        </span>
+      </div>
+    ),
   },
   {
-    accessorKey: 'departmentCount',
-    header: ({ column }) => {
+    id: 'pastor',
+    header: 'Pastor-in-Charge',
+    cell: ({ row }) => {
+      const leader = row.original.leader
       return (
-        <Button
-          variant='ghost'
-          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-        >
-          No. Of Departments
-          <ArrowUpDown className='ml-2 h-4 w-4' />
-        </Button>
+        <div className='flex items-center gap-2'>
+          <div className='h-6 w-6 rounded-full bg-zinc-200 dark:bg-zinc-800 flex items-center justify-center text-[10px] font-bold'>
+            {leader ? `${leader.firstName[0]}${leader.lastName[0]}` : '?'}
+          </div>
+          <span className='text-sm text-zinc-600 dark:text-zinc-400'>
+            {leader ? `${leader.firstName} ${leader.lastName}` : 'Unassigned'}
+          </span>
+        </div>
       )
     },
   },
-
+  {
+    accessorKey: '_count.departments',
+    header: 'Departments',
+    cell: ({ row }) => (
+      <span className='px-2 py-1 rounded-md bg-zinc-100 dark:bg-zinc-900 text-zinc-600 dark:text-zinc-400 text-xs font-black'>
+        {row.original.departmentCount || 0} DEPT
+      </span>
+    ),
+  },
   { accessorKey: 'description', header: 'Description' },
   {
     id: 'actions',
@@ -88,7 +84,7 @@ export const columns: ColumnDef<Teams>[] = [
       return (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant='ghost' className='h-8 w-8 p-0'>
+            <Button variant='ghost' className='h-8 w-8 p-0 cursor-pointer'>
               <span className='sr-only'>Open menu</span>
               <MoreHorizontal className='h-4 w-4' />
             </Button>
@@ -96,14 +92,13 @@ export const columns: ColumnDef<Teams>[] = [
           <DropdownMenuContent align='end'>
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
             <DropdownMenuItem
-              onClick={() => navigator.clipboard.writeText(teams.id.toString())}
+            // onClick={() => navigator.clipboard.writeText(teams.id.toString())}
             >
               Message Pastor
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem>
               <Link href={`/workforce/${teams.id}`}> View Team</Link>
-              {/* <Link href={`/products/${product.id}`}> View team</Link> */}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

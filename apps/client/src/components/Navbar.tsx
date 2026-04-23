@@ -1,56 +1,67 @@
 import Image from 'next/image'
 import Link from 'next/link'
-import { Home, LogIn, UserIcon } from 'lucide-react'
-import { getServerSession } from 'next-auth'
+import { Home, LogIn } from 'lucide-react'
 import Theme from './Theme'
 import Profile from './Profile'
-import { User } from '@repo/types'
-import { getCachedSession } from '../lib/auth'
+import { cookies } from 'next/headers'
+import { Button } from './ui/button'
 
-const Navbar = async () => {
-  const session = await getCachedSession()
+const HomeNavbar = async () => {
+  const cookieStore = await cookies()
+  const accessToken = cookieStore.get('accessToken')?.value
 
   return (
-    <nav className='w-full bg-white dark:bg-black border-b border-gray-400 shadow-3xl fixed z-10 md:px-10 lg:px-30'>
-      <div className='flex items-center justify-between p-4'>
-        {/* LEFT */}
-        <Link href='/' className='flex items-center'>
-          <Image
-            src='/assets/Logo.jpeg'
-            alt='HICC'
-            width={50}
-            height={50}
-            className='w-10 h-10'
-          />
-          <p className='hidden md:block text-md font-medium tracking-wider'>
+    <nav className='fixed top-0 left-0 right-0 z-50 w-full border-b border-gray-100 dark:border-gray-800 bg-white/70 dark:bg-black/70 backdrop-blur-xl'>
+      <div className='max-w-7xl mx-auto flex items-center justify-between px-4 h-16 md:px-10'>
+        {/* LEFT: Logo */}
+        <Link href='/' className='flex items-center gap-3 group'>
+          <div className='relative overflow-hidden rounded-lg'>
+            <Image
+              src='/assets/Logo.jpeg'
+              alt='HICC'
+              width={40}
+              height={40}
+              className='w-10 h-10 transition-transform duration-300 group-hover:scale-110'
+            />
+          </div>
+          <p className='hidden sm:block text-sm font-black tracking-tighter text-foreground'>
             THE GROWTH TRACKER
           </p>
         </Link>
-        {/* RIGHT */}
-        <div className='flex items-center gap-4'>
+
+        {/* RIGHT: Actions */}
+        <div className='flex items-center gap-2 md:gap-6'>
           <Link
             href='/'
-            className='flex items-center justify-center gap-1 cursor-pointer'
+            className='hidden md:flex items-center gap-2 text-sm font-semibold hover:text-blue-600 transition-colors'
           >
-            <Home className='w-6 h-6 md:hidden ' />
-            <p className='hidden md:block font-bold'>Home</p>
+            Home
           </Link>
-          {session?.user ? (
-            <Profile />
-          ) : (
-            <Link
-              href='/sign-in'
-              className='flex items-center justify-center gap-1 cursor-pointer text-gray-700'
-            >
-              <LogIn className='w-6 h-6 md:w-4 md:h-4 text-gray-600' />
-              <p className='hidden md:block text-gray-600 font-bold'>Login</p>
-            </Link>
-          )}
-          <Theme />
+
+          <div className='h-4 w-[1px] bg-gray-200 dark:bg-gray-800 hidden md:block' />
+
+          <div className='flex items-center gap-3'>
+            <Theme />
+
+            {accessToken ? (
+              <Profile />
+            ) : (
+              <Button
+                asChild
+                variant='default'
+                className='rounded-full px-6 font-bold shadow-md hover:shadow-blue-500/20'
+              >
+                <Link href='/sign-in' className='flex items-center gap-2'>
+                  <LogIn className='w-4 h-4' />
+                  <span>Login</span>
+                </Link>
+              </Button>
+            )}
+          </div>
         </div>
       </div>
     </nav>
   )
 }
 
-export default Navbar
+export default HomeNavbar

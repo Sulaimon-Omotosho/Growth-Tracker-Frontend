@@ -10,11 +10,9 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { cn } from '@/lib/utils'
 import { Department } from '@repo/types'
-// import { ProductType } from '@repo/types'
 import { ColumnDef } from '@tanstack/react-table'
-import { ArrowUpDown, MoreHorizontal } from 'lucide-react'
+import { LayoutGrid, MoreHorizontal } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 
@@ -37,28 +35,68 @@ export const columns: ColumnDef<Department>[] = [
       />
     ),
   },
-  { accessorKey: 'name', header: 'Department' },
-  { accessorKey: 'team', header: 'Team' },
   {
-    accessorKey: 'head',
-    header: 'HOD',
+    accessorKey: 'name',
+    // id: 'dept_name',
+    header: 'Department',
+    cell: ({ row }) => (
+      <div className='flex items-center gap-3'>
+        <div className='h-8 w-8 rounded-lg bg-zinc-100 dark:bg-zinc-900 flex items-center justify-center text-zinc-500'>
+          <LayoutGrid size={14} />
+        </div>
+        <div className='flex flex-col'>
+          <span className='font-bold text-zinc-900 dark:text-zinc-100'>
+            {row.getValue('name')}
+          </span>
+          <span className='text-[10px] text-zinc-400 uppercase font-bold tracking-tighter'>
+            {row.original.churchTeam?.name || 'Independent'}
+          </span>
+        </div>
+      </div>
+    ),
   },
   {
-    accessorKey: 'membersCount',
-    header: ({ column }) => {
+    id: 'head',
+    header: 'HOD',
+    cell: ({ row }) => {
+      const leader = row.original.leader
       return (
-        <Button
-          variant='ghost'
-          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-        >
-          No. Of Members
-          <ArrowUpDown className='ml-2 h-4 w-4' />
-        </Button>
+        <div className='flex items-center gap-2'>
+          <div className='h-6 w-6 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 flex items-center justify-center text-[10px] font-black'>
+            {leader ? `${leader.firstName[0]}${leader.lastName[0]}` : '?'}
+          </div>
+          <div className='flex flex-col'>
+            <span className='text-xs font-bold text-zinc-700 dark:text-zinc-300'>
+              {leader ? `${leader.firstName} ${leader.lastName}` : 'Unassigned'}
+            </span>
+            <span className='text-[10px] text-zinc-400'>{leader?.email}</span>
+          </div>
+        </div>
       )
     },
   },
+  {
+    accessorKey: '_count.members',
+    header: 'Personnel',
+    id: 'member_count',
+    cell: ({ row }) => (
+      <div className='flex items-center gap-2'>
+        <div className='w-full bg-zinc-100 dark:bg-zinc-900 rounded-full h-1.5 max-w-15'>
+          <div
+            className='bg-zinc-900 dark:bg-zinc-100 h-1.5 rounded-full'
+            style={{
+              width: `${Math.min((row.original.membersCount || 0) * 5, 100)}%`,
+            }}
+          />
+        </div>
+        <span className='text-[10px] font-black text-zinc-500'>
+          {row.original.membersCount || 0}
+        </span>
+      </div>
+    ),
+  },
 
-  { accessorKey: 'email', header: 'Email' },
+  { accessorKey: 'leader.email', header: 'Email' },
   { accessorKey: 'description', header: 'Description' },
   {
     id: 'actions',
@@ -69,7 +107,7 @@ export const columns: ColumnDef<Department>[] = [
       return (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant='ghost' className='h-8 w-8 p-0'>
+            <Button variant='ghost' className='h-8 w-8 p-0 cursor-pointer'>
               <span className='sr-only'>Open menu</span>
               <MoreHorizontal className='h-4 w-4' />
             </Button>
@@ -85,7 +123,7 @@ export const columns: ColumnDef<Department>[] = [
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem>
-              <Link href={`/workforce/${department.name}`}>
+              <Link href={`/workforce/${department.id}/members`}>
                 {' '}
                 View department
               </Link>

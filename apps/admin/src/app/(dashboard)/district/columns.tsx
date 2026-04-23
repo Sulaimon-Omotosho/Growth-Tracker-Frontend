@@ -10,10 +10,9 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { cn } from '@/lib/utils'
 import { District } from '@repo/types'
 import { ColumnDef } from '@tanstack/react-table'
-import { ArrowUpDown, MoreHorizontal } from 'lucide-react'
+import { ArrowUpDown, MapPin, MoreHorizontal } from 'lucide-react'
 import Link from 'next/link'
 
 export const columns: ColumnDef<District>[] = [
@@ -35,48 +34,65 @@ export const columns: ColumnDef<District>[] = [
       />
     ),
   },
-  // {
-  //   accessorKey: 'name',
-  //   header: 'Team',
-  //   cell: ({ row }) => {
-  //     const product = row.original
-  //     return (
-  //       <div className='w-9 h-9 relative'>
-  //         <Image
-  //           src={
-  //             (product.images as Record<string, string>)?.[
-  //               product.colors[0] || ''
-  //             ] || ''
-  //           }
-  //           alt={product.name}
-  //           fill
-  //           className='rounded-full object-cover'
-  //         />
-  //       </div>
-  //     )
-  //   },
-  // },
-  { accessorKey: 'name', header: 'District' },
   {
-    accessorKey: 'pastor',
-    header: 'Pastor',
+    accessorKey: 'name',
+    // id: 'district_name',
+    header: 'District Name',
+    cell: ({ row }) => (
+      <div className='flex items-center gap-3'>
+        <div className='h-8 w-8 rounded-lg bg-indigo-50 dark:bg-indigo-900/20 flex items-center justify-center text-indigo-600 dark:text-indigo-400'>
+          <MapPin size={14} />
+        </div>
+        <span className='font-bold text-zinc-900 dark:text-zinc-100'>
+          {row.getValue('name')}
+        </span>
+      </div>
+    ),
   },
   {
-    accessorKey: 'communitiesCount',
-    header: ({ column }) => {
+    id: 'district_pastor',
+    header: 'District Pastor',
+    cell: ({ row }) => {
+      const leader = row.original.leader
       return (
-        <Button
-          variant='ghost'
-          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-        >
-          No. Of Cells
-          <ArrowUpDown className='ml-2 h-4 w-4' />
-        </Button>
+        <div className='flex items-center gap-2'>
+          <div className='h-6 w-6 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-[10px] font-black text-zinc-500'>
+            {leader ? `${leader.firstName[0]}${leader.lastName[0]}` : '?'}
+          </div>
+          <span className='text-sm text-zinc-600 dark:text-zinc-400'>
+            {leader ? `${leader.firstName} ${leader.lastName}` : 'Unassigned'}
+          </span>
+        </div>
       )
     },
   },
-
-  { accessorKey: 'description', header: 'Description' },
+  {
+    accessorKey: '_count.communities',
+    id: 'community_count', // Explicit Unique ID
+    header: 'Communities',
+    cell: ({ row }) => (
+      <div className='flex items-center gap-2'>
+        <div className='flex -space-x-2 overflow-hidden'>
+          {/* Visual fluff: tiny circles representing communities */}
+          <div className='inline-block h-4 w-4 rounded-full ring-2 ring-white dark:ring-zinc-950 bg-zinc-200 dark:bg-zinc-800' />
+          <div className='inline-block h-4 w-4 rounded-full ring-2 ring-white dark:ring-zinc-950 bg-zinc-300 dark:bg-zinc-700' />
+        </div>
+        <span className='text-xs font-black text-zinc-500 tracking-tighter'>
+          {row.original.communitiesCount || 0} UNITS
+        </span>
+      </div>
+    ),
+  },
+  {
+    accessorKey: 'description',
+    // id: 'district_desc',
+    header: 'Description',
+    cell: ({ row }) => (
+      <p className='text-xs text-zinc-400 line-clamp-1 max-w-50 italic'>
+        {row.getValue('description') || 'No regional notes...'}
+      </p>
+    ),
+  },
   {
     id: 'actions',
     cell: ({ row }) => {
@@ -85,17 +101,17 @@ export const columns: ColumnDef<District>[] = [
       return (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant='ghost' className='h-8 w-8 p-0'>
+            <Button variant='ghost' className='h-8 w-8 p-0 cursor-pointer'>
               <span className='sr-only'>Open menu</span>
-              <MoreHorizontal className='h-4 w-4' />
+              <MoreHorizontal className='h-4 w-4 cursor-pointer' />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align='end'>
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
             <DropdownMenuItem
-              onClick={() =>
-                navigator.clipboard.writeText(district.id.toString())
-              }
+            // onClick={() =>
+            //   navigator.clipboard.writeText(district.id.toString())
+            // }
             >
               Message Pastor
             </DropdownMenuItem>
@@ -109,3 +125,4 @@ export const columns: ColumnDef<District>[] = [
     },
   },
 ]
+//  <Link href={`/workforce/${teams.id}`}> View Team</Link>

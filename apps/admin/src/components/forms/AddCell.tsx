@@ -11,18 +11,20 @@ import {
   FieldLabel,
 } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import {
-  useCreateCell,
+  useCheckCellName,
   useSearchCommunities,
-  useSearchUsers,
   useSearchZones,
 } from '@/hooks/use-church'
 import { useDebounce } from '@/hooks/use-utils'
+import { useSearchUsers } from '@/hooks/use-user'
+import { AddFormProps } from './AddTeam'
+import { Checkbox } from '../ui/checkbox'
 
 type CellFormValues = z.infer<typeof CellSchema>
 
-const AddCell = () => {
+const AddCell = ({ onSuccess, mutation, onValidationChange }: AddFormProps) => {
   const [userSearch, setUserSearch] = useState('')
   const [communitySearch, setCommunitySearch] = useState('')
   const [zoneSearch, setZoneSearch] = useState('')
@@ -35,11 +37,52 @@ const AddCell = () => {
     resolver: zodResolver(CellSchema),
     defaultValues: {
       name: '',
+      // isOnline: false,
       leaderId: '',
       zoneId: '',
       communityId: '',
+      street: '',
+      city: '',
+      state: '',
+      country: 'Nigeria',
+      zipCode: '',
     },
   })
+  const {
+    formState: { isValid },
+  } = form
+
+  //Availability
+  const checkName = useCheckCellName()
+  const selectedCommunity = form.watch('communityId')
+  const currentName = form.watch('name')
+  const handleNameBlur = async (name: string) => {
+    const communityId = form.getValues('communityId')
+
+    if (!name || !communityId || name.length < 3) return
+    const result = await checkName.mutateAsync({ name, communityId })
+
+    if (!result.available) {
+      form.setError('name', {
+        type: 'manual',
+        message: 'This Cell name is already taken in this community.',
+      })
+    } else {
+      form.clearErrors('name')
+    }
+  }
+
+  // Effects
+  useEffect(() => {
+    const isInvalid = !isValid || checkName.isPending
+    onValidationChange?.(isInvalid)
+  }, [isValid, checkName.isPending, onValidationChange])
+
+  useEffect(() => {
+    if (currentName && selectedCommunity) {
+      handleNameBlur(currentName)
+    }
+  }, [selectedCommunity])
 
   const selectedCommunityId = form.watch('communityId')
 
@@ -52,17 +95,31 @@ const AddCell = () => {
     debouncedZoneSearch,
     selectedCommunityId,
   )
-  const createCell = useCreateCell()
 
   const onSubmit = (data: CellFormValues) => {
-    console.log('Cell Form', data)
+    const payload = {
+      name: data.name,
+      leaderId: data.leaderId,
+      zoneId: data.zoneId,
+      communityId: data.communityId,
+      isOnline: data.isOnline,
+      address: {
+        street: data.street || null,
+        city: data.city,
+        state: data.state,
+        country: data.country || 'Nigeria',
+        zipCode: data.zipCode || null,
+      },
+    }
+    console.log('Add Cell:', payload)
 
-    createCell.mutate(data, {
+    mutation.mutate(payload, {
       onSuccess: () => {
         form.reset()
         setUserSearch('')
         setCommunitySearch('')
         setZoneSearch('')
+        onSuccess?.()
       },
     })
   }
@@ -76,10 +133,36 @@ const AddCell = () => {
             control={form.control}
             render={({ field, fieldState }) => (
               <Field data-invalid={fieldState.invalid}>
-                <FieldLabel htmlFor='name'>Cell Name</FieldLabel>
-                <Input {...field} id='name' aria-invalid={fieldState.invalid} />
+                <FieldLabel htmlFor='name'>
+                  Cell Name {checkName.isPending && ' (Checking...)'}
+                </FieldLabel>
+                <Input
+                  {...field}
+                  id='name'
+                  aria-invalid={fieldState.invalid}
+                  onBlur={(e) => {
+                    field.onBlur()
+                    handleNameBlur(e.target.value)
+                  }}
+                />
                 {fieldState.error && <FieldError errors={[fieldState.error]} />}
               </Field>
+            )}
+          />
+          <Controller
+            name='isOnline'
+            control={form.control}
+            render={({ field }) => (
+              <div className='flex items-center gap-2 mb-4'>
+                <Checkbox
+                  id='isOnline'
+                  checked={field.value}
+                  onCheckedChange={field.onChange}
+                />
+                <FieldLabel htmlFor='isOnline'>
+                  This is an Online Cell
+                </FieldLabel>
+              </div>
             )}
           />
           <Controller
@@ -98,7 +181,7 @@ const AddCell = () => {
                 />
 
                 {!field.value && userSearch.length > 2 && (
-                  <div className='mt-2 rounded border bg-popover shadow-md max-h-40 overflow-auto absolute z-10 w-full'>
+                  <div className='mt-18 rounded border bg-popover shadow-md max-h-40 overflow-auto absolute z-10 w-full'>
                     {isUsersLoading && (
                       <p className='p-2 text-sm text-muted-foreground'>
                         Searching...
@@ -152,7 +235,7 @@ const AddCell = () => {
                 />
 
                 {!field.value && communitySearch.length > 2 && (
-                  <div className='mt-2 rounded border bg-popover shadow-md max-h-40 overflow-auto absolute z-20 w-full'>
+                  <div className='mt-18 rounded border bg-popover shadow-md max-h-40 overflow-auto absolute z-20 w-full'>
                     {isCommunityLoading && (
                       <p className='p-2 text-sm text-muted-foreground'>
                         Searching...
@@ -191,7 +274,7 @@ const AddCell = () => {
             name='zoneId'
             control={form.control}
             render={({ field, fieldState }) => (
-              <Field data-invalid={fieldState.invalid}>
+              <Field className='relative' data-invalid={fieldState.invalid}>
                 <FieldLabel htmlFor='zoneId'>Zone</FieldLabel>
                 <Input
                   disabled={!selectedCommunityId}
@@ -208,7 +291,7 @@ const AddCell = () => {
                 />
 
                 {!field.value && zoneSearch.length > 2 && (
-                  <div className='mt-2 rounded border bg-popover shadow-md max-h-40 overflow-auto absolute z-20 w-full'>
+                  <div className='mt-18 rounded border bg-popover shadow-md max-h-40 overflow-auto absolute z-20 w-full'>
                     {isZoneLoading && (
                       <p className='p-2 text-sm text-muted-foreground'>
                         Searching...
@@ -223,8 +306,6 @@ const AddCell = () => {
 
                     {zones?.map(
                       (z) => (
-                        // {
-                        //   return (
                         <button
                           key={z.id}
                           type='button'
@@ -232,8 +313,6 @@ const AddCell = () => {
                           onClick={() => {
                             field.onChange(z.id)
                             setZoneSearch(z.name)
-                            // setSelectedZone(z)
-                            // setZone([])
                           }}
                         >
                           <p className='font-medium capitalize'>{z.name}</p>
@@ -245,6 +324,60 @@ const AddCell = () => {
                 )}
                 <input type='hidden' value={field.value ?? ''} />
                 {fieldState.error && <FieldError errors={[fieldState.error]} />}
+              </Field>
+            )}
+          />
+
+          {/* Address  */}
+          <h3 className='text-sm font-bold mt-4 uppercase opacity-50'>
+            Address Details
+          </h3>
+          {!form.watch('isOnline') && (
+            <Controller
+              name='street'
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel>Street Address</FieldLabel>
+                  <Input {...field} placeholder='123 Growth Way' />
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
+                </Field>
+              )}
+            />
+          )}
+
+          <div className='grid grid-cols-2 gap-2'>
+            <Controller
+              name='city'
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel>City</FieldLabel>
+                  <Input {...field} placeholder='Lagos' />
+                </Field>
+              )}
+            />
+            <Controller
+              name='state'
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel>State</FieldLabel>
+                  <Input {...field} placeholder='Lagos State' />
+                </Field>
+              )}
+            />
+          </div>
+
+          <Controller
+            name='country'
+            control={form.control}
+            render={({ field, fieldState }) => (
+              <Field data-invalid={fieldState.invalid}>
+                <FieldLabel>Country</FieldLabel>
+                <Input {...field} placeholder='Nigeria' />
               </Field>
             )}
           />

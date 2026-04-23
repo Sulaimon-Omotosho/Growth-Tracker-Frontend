@@ -10,11 +10,9 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { cn } from '@/lib/utils'
 import { Community } from '@repo/types'
-// import { ProductType } from '@repo/types'
 import { ColumnDef } from '@tanstack/react-table'
-import { ArrowUpDown, MoreHorizontal } from 'lucide-react'
+import { ArrowUpDown, Home, MoreHorizontal } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 
@@ -37,48 +35,54 @@ export const columns: ColumnDef<Community>[] = [
       />
     ),
   },
-  // {
-  //   accessorKey: 'name',
-  //   header: 'Team',
-  //   cell: ({ row }) => {
-  //     const product = row.original
-  //     return (
-  //       <div className='w-9 h-9 relative'>
-  //         <Image
-  //           src={
-  //             (product.images as Record<string, string>)?.[
-  //               product.colors[0] || ''
-  //             ] || ''
-  //           }
-  //           alt={product.name}
-  //           fill
-  //           className='rounded-full object-cover'
-  //         />
-  //       </div>
-  //     )
-  //   },
-  // },
-  { accessorKey: 'name', header: 'Community' },
   {
-    accessorKey: 'pastor',
-    header: 'Pastor',
+    accessorKey: 'name',
+    header: 'Community',
+    cell: ({ row }) => (
+      <div className='flex items-center gap-3'>
+        <div className='h-8 w-8 rounded-lg bg-amber-50 dark:bg-amber-900/20 flex items-center justify-center text-amber-600 dark:text-amber-400'>
+          <Home size={14} />
+        </div>
+        <span className='font-bold text-zinc-900 dark:text-zinc-100 uppercase tracking-tight'>
+          {row.getValue('name')}
+        </span>
+      </div>
+    ),
   },
   {
-    accessorKey: 'cellCount',
-    header: ({ column }) => {
+    header: 'Community Pastor',
+    cell: ({ row }) => {
+      const leader = row.original.leader
       return (
-        <Button
-          variant='ghost'
-          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-        >
-          No. Of Cells
-          <ArrowUpDown className='ml-2 h-4 w-4' />
-        </Button>
+        <div className='flex items-center gap-2'>
+          <div className='h-6 w-6 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-[9px] font-black'>
+            {leader ? `${leader.firstName[0]}${leader.lastName[0]}` : '?'}
+          </div>
+          <span className='text-xs font-semibold text-zinc-600 dark:text-zinc-400'>
+            {leader ? `${leader.firstName} ${leader.lastName}` : 'TBD'}
+          </span>
+        </div>
       )
     },
   },
-
-  { accessorKey: 'description', header: 'Description' },
+  {
+    accessorKey: '_count.cells',
+    header: 'Active Cells',
+    cell: ({ row }) => (
+      <span className='inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-black bg-zinc-100 dark:bg-zinc-900 text-zinc-500 border border-zinc-200 dark:border-zinc-800'>
+        {row.original.cellsCount || 0} CELLS
+      </span>
+    ),
+  },
+  {
+    accessorKey: 'description',
+    header: 'Area Description',
+    cell: ({ row }) => (
+      <span className='text-xs text-zinc-400 line-clamp-1 italic'>
+        {row.getValue('description') || 'No locality notes...'}
+      </span>
+    ),
+  },
   {
     id: 'actions',
     cell: ({ row }) => {
@@ -87,7 +91,7 @@ export const columns: ColumnDef<Community>[] = [
       return (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant='ghost' className='h-8 w-8 p-0'>
+            <Button variant='ghost' className='h-8 w-8 p-0 cursor-pointer'>
               <span className='sr-only'>Open menu</span>
               <MoreHorizontal className='h-4 w-4' />
             </Button>
@@ -103,7 +107,10 @@ export const columns: ColumnDef<Community>[] = [
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem>
-              <Link href={`/district/${community.id}`}> View Community</Link>
+              <Link href={`/district/${community.id}/cells`}>
+                {' '}
+                View Community
+              </Link>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

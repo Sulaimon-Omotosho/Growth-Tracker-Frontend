@@ -1,167 +1,82 @@
-import React from 'react'
+'use client'
+
+import React, { useState } from 'react'
 import { DataTable } from './data-table'
 import { columns } from './columns'
-
-//   const getData = async (): Promise<ProductsType> => {
-
-//   try {
-//     const res = await fetch(
-//       `${process.env.NEXT_PUBLIC_PRODUCT_SERVICE_URL}/products`,
-//     )
-//     const data = await res.json()
-//     return data
-//   } catch (error) {
-//     console.log(error)
-//     return []
-//   }
-// }
-
-export const communities = [
-  {
-    id: '1',
-    name: 'Grace Community Ikeja',
-    pastor: 'Pastor Samuel Adeyemi',
-    cellCount: 12,
-    description:
-      'A thriving community focused on spiritual growth and leadership development.',
-    createdAt: '2024-01-15T08:30:00Z',
-    status: 'ACTIVE',
-    membersCount: 320,
-    location: 'Ikeja, Lagos',
-  },
-  {
-    id: '2',
-    name: 'Victory Community Surulere',
-    pastor: 'Pastor Grace Oladipo',
-    cellCount: 10,
-    description: 'Strong emphasis on family values and youth empowerment.',
-    createdAt: '2024-02-10T09:00:00Z',
-    status: 'ACTIVE',
-    membersCount: 280,
-    location: 'Surulere, Lagos',
-  },
-  {
-    id: '3',
-    name: 'Dominion Community Yaba',
-    pastor: 'Pastor Daniel Ogunleye',
-    cellCount: 8,
-    description:
-      'Tech-savvy community with many young professionals and students.',
-    createdAt: '2024-03-18T10:15:00Z',
-    status: 'ACTIVE',
-    membersCount: 250,
-    location: 'Yaba, Lagos',
-  },
-  {
-    id: '4',
-    name: 'Harvest Community Lekki',
-    pastor: 'Pastor Esther Akinwale',
-    cellCount: 11,
-    description: 'Fast-growing community with a diverse membership base.',
-    createdAt: '2024-04-05T11:20:00Z',
-    status: 'ACTIVE',
-    membersCount: 300,
-    location: 'Lekki, Lagos',
-  },
-  {
-    id: '5',
-    name: 'Faith Community Ajah',
-    pastor: 'Pastor Michael Olatunji',
-    cellCount: 7,
-    description: 'Focused on evangelism and community outreach programs.',
-    createdAt: '2024-05-22T07:45:00Z',
-    status: 'ACTIVE',
-    membersCount: 190,
-    location: 'Ajah, Lagos',
-  },
-  {
-    id: '6',
-    name: 'Glory Community Ikorodu',
-    pastor: 'Pastor Joseph Balogun',
-    cellCount: 14,
-    description: 'Large community with strong grassroots engagement.',
-    createdAt: '2024-06-25T12:10:00Z',
-    status: 'ACTIVE',
-    membersCount: 360,
-    location: 'Ikorodu, Lagos',
-  },
-  {
-    id: '7',
-    name: 'Hope Community Epe',
-    pastor: 'Pastor Deborah Ogunyemi',
-    cellCount: 5,
-    description: 'Developing community with focus on rural transformation.',
-    createdAt: '2024-07-12T08:00:00Z',
-    status: 'ACTIVE',
-    membersCount: 140,
-    location: 'Epe, Lagos',
-  },
-  {
-    id: '8',
-    name: 'Heritage Community Badagry',
-    pastor: 'Pastor Philip Adebayo',
-    cellCount: 6,
-    description: 'Historically rich community with strong evangelism culture.',
-    createdAt: '2024-08-18T09:30:00Z',
-    status: 'ACTIVE',
-    membersCount: 170,
-    location: 'Badagry, Lagos',
-  },
-  {
-    id: '9',
-    name: 'Unity Community Festac',
-    pastor: 'Pastor Ruth Alabi',
-    cellCount: 9,
-    description: 'Structured and well-organized community with steady growth.',
-    createdAt: '2024-09-07T10:50:00Z',
-    status: 'ACTIVE',
-    membersCount: 260,
-    location: 'Festac, Lagos',
-  },
-  {
-    id: '10',
-    name: 'Covenant Community Apapa',
-    pastor: 'Pastor Victor Okonkwo',
-    cellCount: 8,
-    description: 'Busy commercial area community with committed members.',
-    createdAt: '2024-10-15T11:35:00Z',
-    status: 'ACTIVE',
-    membersCount: 210,
-    location: 'Apapa, Lagos',
-  },
-  {
-    id: '11',
-    name: 'Revival Community Agege',
-    pastor: 'Pastor Emmanuel Ajayi',
-    cellCount: 10,
-    description: 'Highly energetic community with strong youth presence.',
-    createdAt: '2024-11-25T07:25:00Z',
-    status: 'ACTIVE',
-    membersCount: 290,
-    location: 'Agege, Lagos',
-  },
-  {
-    id: '12',
-    name: 'Elevation Community Ojodu',
-    pastor: 'Pastor Funmi Ojo',
-    cellCount: 8,
-    description: 'Balanced and steadily growing community.',
-    createdAt: '2024-12-20T08:40:00Z',
-    status: 'ACTIVE',
-    membersCount: 240,
-    location: 'Ojodu, Lagos',
-  },
-]
+import { useGetCommunities } from '@/hooks/get-church'
+import { useParams } from 'next/navigation'
+import { SkeletonTable } from '@/components/Skeleton'
+import { Plus, Search, ChevronRight } from 'lucide-react'
+import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
+import type { Community } from '@repo/types'
 
 const Community = () => {
-  const data = communities as any
-  // const data = await getData()
-  return (
-    <div className=''>
-      <div className='mb-8 px-4 py-2 bg-secondary rounded-md'>
-        <h1 className='font-semibold'>All Communities</h1>
+  const params = useParams()
+  const districtId = params.id as string
+  const { data, isLoading, isError } = useGetCommunities(districtId)
+  const [searchQuery, setSearchQuery] = useState('')
+
+  const filteredData =
+    data?.filter((comm: Community) =>
+      comm.name.toLowerCase().includes(searchQuery.toLowerCase()),
+    ) ?? []
+
+  if (isLoading)
+    return (
+      <div className='p-8'>
+        <SkeletonTable />
       </div>
-      <DataTable columns={columns} data={data} />
+    )
+  if (isError)
+    return (
+      <div className='p-8 text-red-500 font-bold italic'>
+        Error: Local community data unreachable.
+      </div>
+    )
+
+  return (
+    <div className='p-6 space-y-6'>
+      {/* LOCAL HUB HEADER */}
+      <div className='flex flex-col md:flex-row md:items-center justify-between gap-4'>
+        <div>
+          <div className='flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 mb-1'>
+            <span>District</span>
+            <ChevronRight size={10} />
+            <span className='text-zinc-500'>Communities</span>
+          </div>
+          <h1 className='text-2xl font-black tracking-tight text-zinc-900 dark:text-zinc-100 flex items-center gap-2'>
+            Community Hubs
+            <span className='text-xs font-medium text-zinc-400 bg-zinc-100 dark:bg-zinc-900 px-2 py-0.5 rounded-full'>
+              {data?.length || 0}
+            </span>
+          </h1>
+        </div>
+        <Button className='bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 font-bold'>
+          <Plus size={16} className='mr-2' /> Add Community
+        </Button>
+      </div>
+
+      {/* FILTERING */}
+      <div className='flex items-center gap-4 bg-white dark:bg-zinc-950 p-4 border border-zinc-100 dark:border-zinc-900 rounded-xl'>
+        <div className='relative flex-1 max-w-sm'>
+          <Search
+            className='absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400'
+            size={16}
+          />
+          <Input
+            placeholder='Search communities...'
+            className='pl-10 bg-zinc-50 dark:bg-zinc-900 border-none'
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+        </div>
+      </div>
+
+      {/* TABLE */}
+      <div className='bg-white dark:bg-zinc-950 border border-zinc-100 dark:border-zinc-900 rounded-2xl overflow-hidden'>
+        <DataTable columns={columns} data={filteredData} />
+      </div>
     </div>
   )
 }

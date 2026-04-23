@@ -2,121 +2,83 @@ import Image from 'next/image'
 import { Card, CardContent, CardFooter, CardTitle } from './ui/card'
 import { Badge } from './ui/badge'
 
-const popularProducts = [
+const latestMessages = [
   {
     id: 1,
-    name: 'Adidas CoreFit T-Shirt',
-    shortDescription:
-      'Lorem ipsum dolor sit amet consect adipisicing elit lorem ipsum dolor sit.',
-    description:
-      'Lorem ipsum dolor sit amet consect adipisicing elit lorem ipsum dolor sit. Lorem ipsum dolor sit amet consect adipisicing elit lorem ipsum dolor sit. Lorem ipsum dolor sit amet consect adipisicing elit lorem ipsum dolor sit.',
-    price: 39.9,
-    sizes: ['s', 'm', 'l', 'xl', 'xxl'],
-    colors: ['gray', 'purple', 'green'],
-    images: {
-      gray: '/products/1g.png',
-      purple: '/products/1p.png',
-      green: '/products/1gr.png',
-    },
+    name: 'John Doe',
+    image: 'https://i.pravatar.cc/150?img=1',
+    message: 'Hey, I just joined your department.',
+    date: '2026-03-29',
+    time: '10:45 AM',
   },
   {
     id: 2,
-    name: 'Puma Ultra Warm Zip',
-    shortDescription:
-      'Lorem ipsum dolor sit amet consect adipisicing elit lorem ipsum dolor sit.',
-    description:
-      'Lorem ipsum dolor sit amet consect adipisicing elit lorem ipsum dolor sit. Lorem ipsum dolor sit amet consect adipisicing elit lorem ipsum dolor sit. Lorem ipsum dolor sit amet consect adipisicing elit lorem ipsum dolor sit.',
-    price: 59.9,
-    sizes: ['s', 'm', 'l', 'xl'],
-    colors: ['gray', 'green'],
-    images: { gray: '/products/2g.png', green: '/products/2gr.png' },
+    name: 'Sarah Johnson',
+    image: 'https://i.pravatar.cc/150?img=5',
+    message: 'Can we meet after service?',
+    date: '2026-03-29',
+    time: '09:20 AM',
   },
   {
     id: 3,
-    name: 'Nike Air Essentials Pullover',
-    shortDescription:
-      'Lorem ipsum dolor sit amet consect adipisicing elit lorem ipsum dolor sit.',
-    description:
-      'Lorem ipsum dolor sit amet consect adipisicing elit lorem ipsum dolor sit. Lorem ipsum dolor sit amet consect adipisicing elit lorem ipsum dolor sit. Lorem ipsum dolor sit amet consect adipisicing elit lorem ipsum dolor sit.',
-    price: 69.9,
-    sizes: ['s', 'm', 'l'],
-    colors: ['green', 'blue', 'black'],
-    images: {
-      green: '/products/3gr.png',
-      blue: '/products/3b.png',
-      black: '/products/3bl.png',
-    },
+    name: 'Michael Smith',
+    image: 'https://i.pravatar.cc/150?img=8',
+    message: 'I’ve updated the growth record.',
+    date: '2026-03-28',
+    time: '06:15 PM',
   },
   {
     id: 4,
-    name: 'Nike Dri Flex T-Shirt',
-    shortDescription:
-      'Lorem ipsum dolor sit amet consect adipisicing elit lorem ipsum dolor sit.',
-    description:
-      'Lorem ipsum dolor sit amet consect adipisicing elit lorem ipsum dolor sit. Lorem ipsum dolor sit amet consect adipisicing elit lorem ipsum dolor sit. Lorem ipsum dolor sit amet consect adipisicing elit lorem ipsum dolor sit.',
-    price: 29.9,
-    sizes: ['s', 'm', 'l'],
-    colors: ['white', 'pink'],
-    images: { white: '/products/4w.png', pink: '/products/4p.png' },
+    name: 'Esther Williams',
+    image: 'https://i.pravatar.cc/150?img=12',
+    message: 'Prayer meeting starts at 6pm.',
+    date: '2026-03-28',
+    time: '03:10 PM',
   },
   {
     id: 5,
-    name: 'Under Armour StormFleece',
-    shortDescription:
-      'Lorem ipsum dolor sit amet consect adipisicing elit lorem ipsum dolor sit.',
-    description:
-      'Lorem ipsum dolor sit amet consect adipisicing elit lorem ipsum dolor sit. Lorem ipsum dolor sit amet consect adipisicing elit lorem ipsum dolor sit. Lorem ipsum dolor sit amet consect adipisicing elit lorem ipsum dolor sit.',
-    price: 49.9,
-    sizes: ['s', 'm', 'l'],
-    colors: ['red', 'orange', 'black'],
-    images: {
-      red: '/products/5r.png',
-      orange: '/products/5o.png',
-      black: '/products/5bl.png',
-    },
+    name: 'Esther Williams',
+    image: 'https://i.pravatar.cc/150?img=12',
+    message: 'Prayer meeting starts at 6pm.',
+    date: '2026-03-28',
+    time: '03:10 PM',
   },
 ]
-
-const latestTransactions = [
+const latestNotifications = [
   {
     id: 1,
-    title: 'Order Payment',
-    badge: 'John Doe',
-    image:
-      'https://images.pexels.com/photos/91227/pexels-photo-91227.jpeg?auto=compress&cs=tinysrgb&w=800',
-    count: 1400,
+    title: 'Added to Department',
+    sender: 'John Doe',
+    date: '2026-03-29',
+    time: '08:30 AM',
   },
   {
     id: 2,
-    title: 'Order Payment',
-    badge: 'Jane Smith',
-    image:
-      'https://images.pexels.com/photos/4969918/pexels-photo-4969918.jpeg?auto=compress&cs=tinysrgb&w=800',
-    count: 2100,
+    title: 'New Member Registered',
+    sender: 'Admin',
+    date: '2026-03-29',
+    time: '07:10 AM',
   },
   {
     id: 3,
-    title: 'Order Payment',
-    badge: 'Michael Johnson',
-    image:
-      'https://images.pexels.com/photos/1681010/pexels-photo-1681010.jpeg?auto=compress&cs=tinysrgb&w=800',
-    count: 1300,
+    title: 'Role Updated',
+    sender: 'System',
+    date: '2026-03-28',
+    time: '09:45 PM',
   },
   {
     id: 4,
-    title: 'Order Payment',
-    badge: 'Lily Adams',
-    image:
-      'https://images.pexels.com/photos/712513/pexels-photo-712513.jpeg?auto=compress&cs=tinysrgb&w=800',
-    count: 2500,
+    title: 'New Message Received',
+    sender: 'Sarah Johnson',
+    date: '2026-03-28',
+    time: '05:20 PM',
   },
   {
     id: 5,
-    title: 'Order Payment',
-    badge: 'Sam Brown',
-    image:
-      'https://images.pexels.com/photos/1680175/pexels-photo-1680175.jpeg?auto=compress&cs=tinysrgb&w=800',
-    count: 1400,
+    title: 'New Message Received',
+    sender: 'Sarah Johnson',
+    date: '2026-03-28',
+    time: '05:20 PM',
   },
 ]
 
@@ -144,39 +106,50 @@ const CardList = async ({ title }: { title: string }) => {
     <div className=''>
       <h1 className='text-lg font-medium mb-6'>{title}</h1>
       <div className='flex flex-col gap-2'>
-        {title === 'Popular Products'
-          ? popularProducts.map((item) => (
-              <Card
-                key={item.id}
-                className='flex-row items-center justify-between gap-4 p-4'
-              >
-                <div className='w-12 h-12 rounded-sm relative overflow-hidden'>
-                  <Image
-                    src={
-                      Object.values(item.images as Record<any, any>)[0] || ''
-                    }
-                    alt={item.name}
-                    fill
-                    className='object-cover'
-                  />
-                </div>
-                <CardContent className='flex-1 p-0'>
-                  <CardTitle className='text-sm font-medium'>
-                    {item.name}
-                  </CardTitle>
-                  {/* <Badge variant='secondary'>{item.badge}</Badge> */}
-                </CardContent>
-                <CardFooter className='p-0'>
-                  ${item.price.toFixed(2)}
-                </CardFooter>
-              </Card>
-            ))
-          : latestTransactions.map((item) => (
-              <Card
-                key={item.id}
-                className='flex-row items-center justify-between gap-4 p-4'
-              >
-                {/* <div className='w-12 h-12 rounded-sm relative overflow-hidden'>
+        {/* MESSAGES  */}
+        {title === 'Latest Messages' &&
+          latestMessages.map((item) => (
+            <Card
+              key={item.id}
+              className='flex-row items-center gap-4 p-4 hover:bg-muted/50 hover:cursor-pointer transition rounded-lg'
+            >
+              {/* Avatar  */}
+              <div className='w-12 h-12 rounded-full relative overflow-hidden'>
+                <Image
+                  src={item.image}
+                  alt={item.name}
+                  fill
+                  className='object-cover'
+                />
+              </div>
+
+              {/* Content  */}
+              <CardContent className='flex-1 p-0'>
+                <CardTitle className='text-sm font-semibold'>
+                  {item.name}
+                </CardTitle>
+                <p className='text-xs text-muted-foreground truncate'>
+                  {item.message}
+                </p>
+                {/* <Badge variant='secondary'>{item.badge}</Badge> */}
+              </CardContent>
+
+              {/* Time  */}
+              {/* <CardFooter className='p-0 text-xs text-muted-foreground flex flex-col items-end'>
+                <span>{item.time} </span>
+                <span>{item.date} </span>
+              </CardFooter> */}
+            </Card>
+          ))}
+
+        {/* NOTIFICATIONS  */}
+        {title === 'Latest Notifications' &&
+          latestNotifications.map((item) => (
+            <Card
+              key={item.id}
+              className='flex-row items-center gap-4 p-4 hover:bg-muted/50 hover:cursor-pointer transition rounded-lg'
+            >
+              {/* <div className='w-12 h-12 rounded-sm relative overflow-hidden'>
                   <Image
                     src={item.image}
                     alt={item.title}
@@ -184,15 +157,20 @@ const CardList = async ({ title }: { title: string }) => {
                     className='object-cover'
                   />
                 </div> */}
-                <CardContent className='flex-1 p-0'>
-                  <CardTitle className='text-sm font-medium'>
-                    {item.title}
-                  </CardTitle>
-                  <Badge variant='secondary'>{item.badge}</Badge>
-                </CardContent>
-                <CardFooter className='p-0'>${item.count / 100}K</CardFooter>
-              </Card>
-            ))}
+              <CardContent className='flex-1 p-0'>
+                <CardTitle className='text-sm font-semibold'>
+                  {item.title}
+                </CardTitle>
+                <div className='flex items-center gap-2 mt-1'>
+                  <Badge variant='secondary'>{item.sender}</Badge>
+                </div>
+              </CardContent>
+              <CardFooter className='p-0 text-xs text-muted-foreground flex flex-col items-end'>
+                <span>{item.time}</span>
+                <span>{item.date}</span>
+              </CardFooter>
+            </Card>
+          ))}
       </div>
     </div>
   )

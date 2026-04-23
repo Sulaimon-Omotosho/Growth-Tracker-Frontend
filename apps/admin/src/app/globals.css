@@ -1,6 +1,6 @@
-@import "tailwindcss";
-@import "tw-animate-css";
-@import "shadcn/tailwind.css";
+@import 'tailwindcss';
+@import 'tw-animate-css';
+@import 'shadcn/tailwind.css';
 
 @custom-variant dark (&:is(.dark *));
 
@@ -49,6 +49,8 @@
 }
 
 :root {
+  --present-bar: theme('colors.zinc.800');
+  --absent-bar: theme('colors.zinc.300');
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);
@@ -72,6 +74,11 @@
   --chart-3: oklch(0.439 0 0);
   --chart-4: oklch(0.371 0 0);
   --chart-5: oklch(0.269 0 0);
+  --pie-primary: theme('colors.zinc.900');
+  --pie-secondary: theme('colors.zinc.700');
+  --pie-tertiary: theme('colors.zinc.500');
+  --pie-quaternary: theme('colors.zinc.400');
+  --pie-quinary: theme('colors.zinc.200');
   --radius: 0.625rem;
   --sidebar: oklch(0.985 0 0);
   --sidebar-foreground: oklch(0.145 0 0);
@@ -84,6 +91,8 @@
 }
 
 .dark {
+  --present-bar: theme('colors.zinc.200');
+  --absent-bar: theme('colors.zinc.700');
   --background: oklch(0.145 0 0);
   --foreground: oklch(0.985 0 0);
   --card: oklch(0.205 0 0);
@@ -107,6 +116,11 @@
   --chart-3: oklch(0.439 0 0);
   --chart-4: oklch(0.371 0 0);
   --chart-5: oklch(0.269 0 0);
+  --pie-primary: theme('colors.zinc.100');
+  --pie-secondary: theme('colors.zinc.300');
+  --pie-tertiary: theme('colors.zinc.500');
+  --pie-quaternary: theme('colors.zinc.700');
+  --pie-quinary: theme('colors.zinc.900');
   --sidebar: oklch(0.205 0 0);
   --sidebar-foreground: oklch(0.985 0 0);
   --sidebar-primary: oklch(0.488 0.243 264.376);

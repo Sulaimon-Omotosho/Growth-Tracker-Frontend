@@ -1,7 +1,7 @@
 'use client'
 
-import { TrendingUp } from 'lucide-react'
-import { Area, AreaChart, CartesianGrid, XAxis } from 'recharts'
+import { TrendingUp, Users } from 'lucide-react'
+import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from 'recharts'
 import {
   Card,
   CardContent,
@@ -31,77 +31,113 @@ const chartData = [
 ]
 
 const chartConfig = {
-  desktop: {
-    label: 'Sunday',
-    color: 'var(--chart-1)',
+  sunday: {
+    label: 'Sunday Service',
+    color: 'hsl(var(--chart-1))',
   },
-  mobile: {
-    label: 'Midweek',
-    color: 'var(--chart-2)',
+  midweek: {
+    label: 'Midweek Service',
+    color: 'hsl(var(--chart-2))',
   },
 } satisfies ChartConfig
 
 export function AttendanceChart() {
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Attendance Chart</CardTitle>
-        <CardDescription>
-          Showing total attendance for the last 6 months
-        </CardDescription>
+    <Card className='border-none shadow-none bg-transparent'>
+      <CardHeader className='flex flex-row items-center justify-between pb-8'>
+        <div className='grid gap-1'>
+          <CardTitle className='text-base font-bold'>
+            Attendance Trends
+          </CardTitle>
+          <CardDescription className='text-xs'>
+            Comparing Sunday and Midweek engagement
+          </CardDescription>
+        </div>
+        <div className='flex items-center gap-2 bg-green-50 dark:bg-green-900/20 px-3 py-1 rounded-full'>
+          <TrendingUp className='w-3 h-3 text-green-600' />
+          <span className='text-[10px] font-bold text-green-600 uppercase'>
+            +12%
+          </span>
+        </div>
       </CardHeader>
-      <CardContent className='px-2 lg:px-6'>
-        <ChartContainer config={chartConfig}>
+      <CardContent className='px-0'>
+        <ChartContainer config={chartConfig} className='h-75 w-full'>
           <AreaChart
             accessibilityLayer
             data={chartData}
-            margin={{
-              left: 12,
-              right: 12,
-            }}
+            margin={{ left: 0, right: 0, top: 10, bottom: 0 }}
           >
-            <CartesianGrid vertical={false} />
+            <defs>
+              <linearGradient id='fillSunday' x1='0' y1='0' x2='0' y2='1'>
+                <stop
+                  offset='5%'
+                  stopColor='var(--color-sunday)'
+                  stopOpacity={0.3}
+                />
+                <stop
+                  offset='95%'
+                  stopColor='var(--color-sunday)'
+                  stopOpacity={0}
+                />
+              </linearGradient>
+              <linearGradient id='fillMidweek' x1='0' y1='0' x2='0' y2='1'>
+                <stop
+                  offset='5%'
+                  stopColor='var(--color-midweek)'
+                  stopOpacity={0.3}
+                />
+                <stop
+                  offset='95%'
+                  stopColor='var(--color-midweek)'
+                  stopOpacity={0}
+                />
+              </linearGradient>
+            </defs>
+            <CartesianGrid
+              vertical={false}
+              strokeDasharray='3 3'
+              className='stroke-muted'
+            />
             <XAxis
               dataKey='month'
               tickLine={false}
               axisLine={false}
-              tickMargin={8}
+              tickMargin={12}
               tickFormatter={(value) => value.slice(0, 3)}
+              className='text-[10px] font-medium text-muted-foreground'
+            />
+            <YAxis
+              tickLine={false}
+              axisLine={false}
+              tickMargin={12}
+              className='text-[10px] font-medium text-muted-foreground'
             />
             <ChartTooltip
-              cursor={false}
-              content={<ChartTooltipContent indicator='line' />}
+              cursor={{ stroke: 'var(--border)', strokeWidth: 1 }}
+              content={<ChartTooltipContent indicator='dot' />}
             />
             <Area
               dataKey='midweek'
-              type='natural'
-              fill='var(--color-mobile)'
-              fillOpacity={0.4}
-              stroke='var(--color-mobile)'
-              stackId='a'
+              type='monotone' // Swapped 'natural' for 'monotone' for a cleaner curve
+              fill='url(#fillMidweek)'
+              stroke='var(--color-midweek)'
+              strokeWidth={2}
             />
             <Area
               dataKey='sunday'
-              type='natural'
-              fill='var(--color-desktop)'
-              fillOpacity={0.4}
-              stroke='var(--color-desktop)'
-              stackId='a'
+              type='monotone'
+              fill='url(#fillSunday)'
+              stroke='var(--color-sunday)'
+              strokeWidth={2}
             />
-            <ChartLegend content={<ChartLegendContent />} />
+            <ChartLegend content={<ChartLegendContent className='mt-4' />} />
           </AreaChart>
         </ChartContainer>
       </CardContent>
-      <CardFooter>
-        <div className='flex w-full items-start gap-2 text-sm'>
-          <div className='grid gap-2'>
-            {/* <div className='flex items-center gap-2 leading-none font-medium'>
-              Trending up by 5.2% this month <TrendingUp className='h-4 w-4' />
-            </div> */}
-            <div className='text-muted-foreground flex items-center gap-2 leading-none'>
-              January - June 2026
-            </div>
-          </div>
+      <CardFooter className='pt-4 px-0'>
+        <div className='flex items-center gap-2 text-[10px] font-bold text-muted-foreground uppercase tracking-widest'>
+          <Users className='w-3 h-3' />
+          Data verified for H1 2026
         </div>
       </CardFooter>
     </Card>
