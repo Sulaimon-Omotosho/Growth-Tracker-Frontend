@@ -47,7 +47,9 @@ export function RightDrawer({
           <DrawerTitle>{title}</DrawerTitle>
           {description && <DrawerDescription>{description}</DrawerDescription>}
         </DrawerHeader>
-        <div className='no-scrollbar overflow-y-auto px-4'>{children}</div>
+        <div className='no-scrollbar overflow-y-auto px-4 h-full'>
+          {children}
+        </div>
         <DrawerFooter>
           {formId && (
             <Button

@@ -1,14 +1,15 @@
+'use client'
+
 import Image from 'next/image'
 import Link from 'next/link'
 import { Home, LogIn } from 'lucide-react'
 import Theme from './Theme'
 import Profile from './Profile'
-import { cookies } from 'next/headers'
 import { Button } from './ui/button'
+import { useMe } from '@/hooks/get-user'
 
-const HomeNavbar = async () => {
-  const cookieStore = await cookies()
-  const accessToken = cookieStore.get('accessToken')?.value
+const HomeNavbar = () => {
+  const { data, isLoading } = useMe()
 
   return (
     <nav className='fixed top-0 left-0 right-0 z-50 w-full border-b border-gray-100 dark:border-gray-800 bg-white/70 dark:bg-black/70 backdrop-blur-xl'>
@@ -43,7 +44,7 @@ const HomeNavbar = async () => {
           <div className='flex items-center gap-3'>
             <Theme />
 
-            {accessToken ? (
+            {data ? (
               <Profile />
             ) : (
               <Button

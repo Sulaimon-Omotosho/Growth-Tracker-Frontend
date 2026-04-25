@@ -7,7 +7,7 @@ export function useCreateEvent() {
 
   return useMutation({
     mutationFn: (payload: any) =>
-      fetcher(`/church/events`, {
+      fetcher(`/events`, {
         method: 'POST',
         body: JSON.stringify(payload),
       }),

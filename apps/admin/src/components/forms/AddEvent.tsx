@@ -61,12 +61,12 @@ const AddEvent = ({
     }
     console.log('Add Event:', payload)
 
-    // mutation.mutate(payload, {
-    //   onSuccess: () => {
-    //     reset()
-    //     onSuccess?.()
-    //   },
-    // })
+    mutation.mutate(payload, {
+      onSuccess: () => {
+        reset()
+        onSuccess?.()
+      },
+    })
   }
 
   return (

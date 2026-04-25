@@ -36,17 +36,17 @@ export default function EventsPage() {
     event: useCreateEvent(),
   }
 
-  // {
-  //   events.length === 0 && (
-  //     <div className='flex flex-col items-center justify-center py-20 text-center border-2 border-dashed rounded-xl border-zinc-200'>
-  //       <Calendar className='h-10 w-10 text-zinc-300 mb-4' />
-  //       <h3 className='font-semibold'>No events scheduled</h3>
-  //       <p className='text-sm text-zinc-500'>
-  //         There are no events on the timeline for this day.
-  //       </p>
-  //     </div>
-  //   )
-  // }
+  {
+    event?.length === 0 && (
+      <div className='flex flex-col items-center justify-center py-20 text-center border-2 border-dashed rounded-xl border-zinc-200'>
+        <Calendar className='h-10 w-10 text-zinc-300 mb-4' />
+        <h3 className='font-semibold'>No events scheduled</h3>
+        <p className='text-sm text-zinc-500'>
+          There are no events on the timeline for this day.
+        </p>
+      </div>
+    )
+  }
 
   return (
     <div className='p-6 space-y-8'>
@@ -429,17 +429,3 @@ export default function EventsPage() {
     </div>
   )
 }
-
-// function ResourceItem({ label, status, isOccupied = false }: any) {
-//   return (
-//     <div className='flex justify-between items-center text-sm'>
-//       <span className='text-zinc-500'>{label}</span>
-//       <Badge
-//         variant={isOccupied ? 'destructive' : 'outline'}
-//         className='text-[10px]'
-//       >
-//         {status}
-//       </Badge>
-//     </div>
-//   )
-// }

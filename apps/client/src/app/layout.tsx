@@ -5,6 +5,7 @@ import { ThemeProvider } from '../utils/theme-provider'
 import Providers from '../lib/Providers'
 import AuthGuard from '../lib/AuthGuard'
 import { Toaster } from 'sonner'
+import { RefreshHeartbeat } from '@/lib/refresh-heartbeat'
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -37,6 +38,7 @@ export default async function RootLayout({
         <div className=''>
           <ThemeProvider>
             <Providers>
+              <RefreshHeartbeat />
               <AuthGuard>{children}</AuthGuard>
             </Providers>
             <Toaster position='bottom-right' />

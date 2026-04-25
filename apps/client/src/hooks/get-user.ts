@@ -16,16 +16,6 @@ export function useMe() {
   })
 }
 
-// Get Small Groups
-// export function useGetSmallGroups() {
-//   return useQuery({
-//     queryKey: ['user-groups'],
-//     queryFn: async () => {
-//       const data = await fetcher('users/me/groups')
-//       return data
-//     },
-//   })
-// }
 export function useGetSmallGroups() {
   return useQuery({
     queryKey: ['user-groups', 'me'],

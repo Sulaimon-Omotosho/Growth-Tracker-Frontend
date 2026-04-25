@@ -1,16 +1,16 @@
-import { cookies } from 'next/headers'
+'use client'
+
 import Link from 'next/link'
 import Image from 'next/image'
 import { ArrowRight, LayoutDashboard, LogIn } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { useMe } from '@/hooks/get-user'
 
-export default async function PortalPage() {
-  const cookieStore = await cookies()
-  const accessToken = cookieStore.get('accessToken')?.value
+export default function PortalPage() {
+  const { data: user, isLoading } = useMe()
 
   return (
     <div className='relative flex min-h-screen items-center justify-center bg-white dark:bg-black overflow-hidden'>
-      {/* Background Decorative Elements - Matches your Web3/Tech vibe */}
       <div className='absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none'>
         <div className='absolute -top-[10%] -left-[10%] w-[40%] h-[40%] bg-blue-500/10 rounded-full blur-[120px]' />
         <div className='absolute -bottom-[10%] -right-[10%] w-[40%] h-[40%] bg-amber-500/10 rounded-full blur-[120px]' />
@@ -19,7 +19,6 @@ export default async function PortalPage() {
       <div className='relative z-10 w-full max-w-md px-6'>
         <div className='bg-white/80 dark:bg-zinc-900/50 backdrop-blur-2xl border border-gray-100 dark:border-zinc-800 rounded-3xl p-10 shadow-2xl'>
           <div className='flex flex-col items-center text-center gap-8'>
-            {/* Branding */}
             <div className='space-y-4'>
               <div className='flex justify-center'>
                 <Image
@@ -41,7 +40,7 @@ export default async function PortalPage() {
             </div>
 
             <div className='flex w-full flex-col gap-4'>
-              {accessToken ? (
+              {user ? (
                 <Button
                   asChild
                   size='lg'

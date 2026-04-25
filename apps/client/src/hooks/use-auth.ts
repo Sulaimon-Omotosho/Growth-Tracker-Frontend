@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 
 // Authorizations
+
 export function useSignup() {
   return useMutation({
     mutationFn: (data: any) =>
@@ -13,6 +14,43 @@ export function useSignup() {
       }),
   })
 }
+// export function useSignup() {
+//   return useMutation({
+//     mutationFn: async (data: any) => {
+//       const res = await fetch('/api/auth/register', {
+//         method: 'POST',
+//         headers: { 'Content-Type': 'application/json' },
+//         body: JSON.stringify(data),
+//       })
+
+//       if (!res.ok) throw new Error('Signup failed')
+//       return res.json()
+//     },
+//   })
+// }
+// export function useLogin() {
+//   const queryClient = useQueryClient()
+//   const router = useRouter()
+
+//   return useMutation({
+//     mutationFn: async (data: { email: string; password: string }) => {
+//       const res = await fetch('/api/auth/login', {
+//         method: 'POST',
+//         headers: { 'Content-Type': 'application/json' },
+//         body: JSON.stringify(data),
+//       })
+
+//       if (!res.ok) throw new Error('Login failed')
+//       return res.json()
+//     },
+
+//     onSuccess: async () => {
+//       await queryClient.invalidateQueries({ queryKey: ['me'] })
+//       router.push('/home')
+//       router.refresh()
+//     },
+//   })
+// }
 
 export function useLogin() {
   const queryClient = useQueryClient()
@@ -33,6 +71,30 @@ export function useLogin() {
     },
   })
 }
+
+// export function useGoogleLogin() {
+//   const queryClient = useQueryClient()
+//   const router = useRouter()
+
+//   return useMutation({
+//     mutationFn: async (token: string) => {
+//       const res = await fetch('/api/auth/google', {
+//         method: 'POST',
+//         headers: { 'Content-Type': 'application/json' },
+//         body: JSON.stringify({ token }),
+//       })
+
+//       if (!res.ok) throw new Error('Google login failed')
+//       return res.json()
+//     },
+
+//     onSuccess: async () => {
+//       await queryClient.invalidateQueries({ queryKey: ['me'] })
+//       router.push('/home')
+//       router.refresh()
+//     },
+//   })
+// }
 
 export function useGoogleLogin() {
   const queryClient = useQueryClient()
@@ -64,6 +126,7 @@ export function useLogout() {
 
     onSuccess: () => {
       queryClient.clear()
+      localStorage.removeItem('user')
       router.push('/')
       router.refresh()
     },

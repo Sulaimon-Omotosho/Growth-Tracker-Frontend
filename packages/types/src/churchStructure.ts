@@ -72,6 +72,10 @@ export const SmallGroupSchema = z.object({
   leaderId: z.string().optional(),
 })
 
+export const JoinSmallGroupSchema = z.object({
+  smallGroupId: z.string().min(3, 'Small group needed'),
+})
+
 export const JoinCellSchema = z.object({
   zoneId: z.string().min(1, { message: 'Zone needed for this Application' }),
   cellId: z.string().min(1, { message: 'Cell needed for this Application' }),
@@ -98,4 +102,12 @@ export const EventSchema = z.object({
       }),
     )
     .min(1, 'At least one session is required'),
+})
+
+export const AnnouncementFormSchema = z.object({
+  title: z.string().min(3, 'Title is required'),
+  content: z.string().min(3, 'Please drop content'),
+  scope: z.string(),
+  targetId: z.string().optional().nullable(),
+  priority: z.enum(['NORMAL', 'HIGH', 'URGENT']),
 })

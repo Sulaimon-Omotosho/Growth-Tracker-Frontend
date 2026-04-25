@@ -7,31 +7,30 @@ export function Calendar18() {
   const [date, setDate] = React.useState<Date | undefined>(new Date())
 
   return (
-    <div className='flex justify-center items-center w-full'>
+    <div className='flex justify-center items-center w-full h-full'>
       <Calendar
         mode='single'
         selected={date}
         onSelect={setDate}
-        className='p-0 w-full'
+        className='p-0 h-full w-full flex items-center justify-center'
         classNames={{
-          months: 'w-full',
-          month: 'space-y-4 w-full',
-          // Position relative so we can absolute position the buttons
-          caption: 'flex justify-center pt-1 relative items-center mb-4',
+          months: 'w-full h-full flex flex-col items-center ',
+          month: 'space-y-4 w-full flex flex-col ',
+          caption: 'flex justify-center pt-1 relative items-center mb-4 ',
           caption_label: 'text-sm font-bold text-gray-900 dark:text-gray-100',
-          nav: 'flex items-center',
+          nav: 'flex w-full items-center justify-between',
           // Pin Prev to left and Next to right
           nav_button_previous:
-            'absolute left-1 h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100 transition-opacity',
+            'absolute left-1 h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100 transition-opacity cursor-pointer',
           nav_button_next:
-            'absolute right-1 h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100 transition-opacity',
+            'absolute right-1 h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100 transition-opacity cursor-pointer ',
           table: 'w-full border-collapse',
           head_row: 'flex justify-between w-full',
           head_cell:
             'text-gray-400 rounded-md w-9 font-medium text-[10px] uppercase tracking-tighter text-center',
           row: 'flex w-full mt-2 justify-between',
-          cell: 'text-center text-sm p-0 relative focus-within:relative focus-within:z-20',
-          day: 'h-9 w-9 p-0 font-normal hover:bg-blue-100 dark:hover:bg-blue-900/30 rounded-md transition-all flex items-center justify-center',
+          cell: 'text-center text-sm p-0 relative focus-within:relative focus-within:z-20 ',
+          day: 'h-9 w-9 p-0 font-normal hover:bg-blue-100 dark:hover:bg-blue-900/30 rounded-md transition-all flex items-center justify-center w-full',
           day_selected:
             'bg-blue-600 text-white hover:bg-blue-600 hover:text-white focus:bg-blue-600 focus:text-white rounded-md shadow-md shadow-blue-500/30 scale-105',
           day_today:

@@ -6,12 +6,23 @@ import Link from 'next/link'
 import NextStepCard from '@/components/dashboard/NextStepCard'
 import Events from '@/components/dashboard/Events'
 import { AttendanceChart } from '@/components/dashboard/AttendanceChart'
-import MessageCard from '@/components/dashboard/MessageCard'
 import { useUser } from '@/utils/userContext'
-import { User } from '@repo/types'
+import { redirect } from 'next/navigation'
+import { AnnouncementCard } from '@/components/dashboard/AnnouncementCard'
+import { MessageCard } from '@/components/dashboard/MessageCard'
+import { MOCK_ANNOUNCEMENTS, MOCK_MESSAGES } from '@/lib/mock'
+import { useAnnouncements } from '@/hooks/get-events'
 
 const UserDashboard = () => {
   const { user, isLoading } = useUser()
+  console.log('Dashboard:', user)
+
+  const { data: announcements, isLoading: announcementsLoading } =
+    useAnnouncements()
+
+  const messages = MOCK_MESSAGES
+
+  if (!user) redirect('/')
 
   // Loading UI
   if (isLoading) {
@@ -98,15 +109,18 @@ const UserDashboard = () => {
                     Messages
                   </h2>
                   <Link
-                    href='/messages'
+                    href='/dashboard/messages'
                     className='text-[10px] font-bold text-blue-600 uppercase hover:underline'
                   >
                     View All
                   </Link>
                 </div>
                 <div className='flex flex-col gap-3'>
-                  {[1, 2, 3, 4, 5].map((i) => (
+                  {/* {[1, 2, 3, 4, 5].map((i) => (
                     <MessageCard key={i} />
+                  ))} */}
+                  {messages.map((m) => (
+                    <MessageCard key={m.id} {...m} />
                   ))}
 
                   {/* PAGINATION DOTS */}
@@ -127,13 +141,32 @@ const UserDashboard = () => {
                   </h2>
                 </div>
                 <div className='flex flex-col gap-3 bg-orange-50/50 dark:bg-orange-900/10 p-3 rounded-xl border border-orange-100 dark:border-orange-900/30'>
-                  {[1, 2, 3, 4].map((i) => (
-                    <MessageCard key={i} />
-                  ))}
+                  {announcementsLoading ? (
+                    <p>Loading your feed...</p>
+                  ) : (
+                    announcements
+                      ?.slice(0, 4)
+                      .map((ann: any) => (
+                        <AnnouncementCard
+                          key={ann.id}
+                          title={ann.title}
+                          content={ann.content}
+                          authorName={`${ann.author?.firstName} ${ann.author?.lastName}`}
+                          date={ann.createdAt}
+                          priority={ann.priority}
+                          scope={ann.scope}
+                        />
+                      ))
+                  )}
 
-                  <button className='w-full py-2 text-xs font-semibold text-orange-600 dark:text-orange-400 hover:bg-orange-100 dark:hover:bg-orange-900/20 rounded-lg transition-colors'>
-                    See All Announcements
-                  </button>
+                  <Link
+                    href='/dashboard/announcements'
+                    className='block w-full'
+                  >
+                    <button className='w-full py-2 text-xs font-semibold text-orange-600 dark:text-orange-400 hover:bg-orange-100 dark:hover:bg-orange-900/20 rounded-lg transition-colors'>
+                      See All Announcements
+                    </button>
+                  </Link>
                 </div>
               </div>
             </aside>

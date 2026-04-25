@@ -23,7 +23,7 @@ const Events = () => {
       {/* Main Container */}
       <div className='grid grid-cols-1 xl:grid-cols-2 gap-6 bg-white dark:bg-gray-900/50 p-4 md:p-6 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm'>
         {/* Calendar Section */}
-        <div className='w-full flex flex-col justify-center border-b xl:border-b-0 xl:border-r border-gray-100 dark:border-gray-800 pb-6 xl:pb-0 xl:pr-6'>
+        <div className='w-full h-full flex flex-col justify-center border-b xl:border-b-0 xl:border-r border-gray-100 dark:border-gray-800 pb-6 xl:pb-0 xl:pr-6'>
           <div className='mb-4'>
             <h3 className='text-xs font-bold text-gray-400 uppercase'>
               Attendance Calendar
@@ -36,7 +36,7 @@ const Events = () => {
         <div className='w-full flex flex-col justify-center pt-6 xl:pt-0 xl:pl-6'>
           <div className='mb-4'>
             <h3 className='text-xs font-bold text-gray-400 uppercase'>
-              Upcoming Highlights
+              Upcoming Events
             </h3>
           </div>
           <div className='flex justify-center items-center h-full'>

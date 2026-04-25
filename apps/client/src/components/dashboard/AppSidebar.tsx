@@ -10,6 +10,7 @@ import {
   Earth,
   Home,
   Inbox,
+  LayoutDashboard,
   LibraryBig,
   LogOut,
   Mail,
@@ -46,26 +47,27 @@ import { useUser } from '@/utils/userContext'
 import { RightDrawer } from './RightDrawer'
 import JoinCell from '../forms/JoinCell'
 import { useState } from 'react'
-import { useJoinCell, useJoinDept } from '@/hooks/use-church'
+import { useJoinCell, useJoinDept, useJoinSmallGroup } from '@/hooks/use-church'
 import JoinDept from '../forms/joinDept'
-import JoinSMG from '../forms/JoinSMG'
+import JoinSMG from '../forms/JoinSmallGroup'
+import JoinSmallGroup from '../forms/JoinSmallGroup'
 
 // Menu items.
 const mainItems = [
   { title: 'Home', url: '/dashboard', icon: Home },
-  { title: 'Inbox', url: '#', icon: Inbox },
-  { title: 'Calendar', url: '#', icon: Calendar },
+  { title: 'Inbox', url: '/dashboard/messages', icon: Inbox },
+  { title: 'Calendar', url: '/dashboard/schedule', icon: Calendar },
 ]
 
 export function AppSidebar() {
   const { user } = useUser()
-  // console.log('Sidebar:', user)
 
   // Form States
   const [isSubmitDisabled, setIsSubmitDisabled] = useState(true)
   const [isOpen, setIsOpen] = useState<'dept' | 'cell' | 'smg' | null>(null)
   const joinCell = useJoinCell()
   const joinDept = useJoinDept()
+  const joinSMG = useJoinSmallGroup()
 
   return (
     <Sidebar
@@ -112,6 +114,16 @@ export function AppSidebar() {
                 </SidebarMenuButton>
               </SidebarMenuItem>
             ))}
+            {user?.role !== 'MEMBER' && (
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild tooltip='Management Hub'>
+                  <Link href='/dashboard/management_hub'>
+                    <LayoutDashboard className='w-4 h-4' />
+                    <span className='font-medium'>Management Hub</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            )}
           </SidebarMenu>
         </SidebarGroup>
 
@@ -165,7 +177,7 @@ export function AppSidebar() {
           <SidebarMenu>
             <SidebarMenuItem>
               <SidebarMenuButton asChild tooltip='Cell'>
-                <Link href='/cell'>
+                <Link href='/dashboard/cell'>
                   <School />
                   <span>{user?.cell?.name || 'Join a Cell'}</span>
                 </Link>
@@ -196,7 +208,7 @@ export function AppSidebar() {
 
             <SidebarMenuItem>
               <SidebarMenuButton asChild tooltip='Department'>
-                <Link href='/departments'>
+                <Link href='/dashboard/departments'>
                   <BriefcaseBusiness />
                   <span>{user?.departments?.[0]?.name || 'Departments'}</span>
                   {user?.departments && user.departments.length > 1 && (
@@ -232,7 +244,7 @@ export function AppSidebar() {
             {/* FIX THIS  */}
             <SidebarMenuItem>
               <SidebarMenuButton asChild tooltip='Other Groups'>
-                <Link href='/interests'>
+                <Link href='/dashboard/interests'>
                   <Earth />
                   <span>Other Groups</span>
                   {user?.smallGroups && user?.smallGroups?.length > 1 && (
@@ -253,12 +265,12 @@ export function AppSidebar() {
                 onOpenChange={(open) => setIsOpen(open ? 'smg' : null)}
                 submitLabel='Submit'
                 formId='join-smg'
-                isLoading={joinDept.isPending}
+                isLoading={joinSMG.isPending}
                 isSubmitDisabled={isSubmitDisabled}
               >
-                <JoinSMG
+                <JoinSmallGroup
                   user={user!}
-                  mutation={joinDept}
+                  mutation={joinSMG}
                   onSuccess={() => setIsOpen(null)}
                   onValidationChange={setIsSubmitDisabled}
                 />
@@ -275,14 +287,14 @@ export function AppSidebar() {
             <SidebarMenu>
               <SidebarMenuItem>
                 <SidebarMenuButton asChild tooltip='Messages'>
-                  <Link href='/user'>
+                  <Link href='/dashboard/messages'>
                     <Mail /> Messages
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
                 <SidebarMenuButton asChild tooltip='Events'>
-                  <Link href='/user'>
+                  <Link href='/dashboard/events'>
                     <CalendarCheck /> Events & Programs
                   </Link>
                 </SidebarMenuButton>
@@ -324,7 +336,9 @@ export function AppSidebar() {
                 className='w-56 rounded-xl'
               >
                 <DropdownMenuItem className='gap-2'>
-                  <User className='w-4 h-4' /> Profile
+                  <Link href={`/dashboard/${user?.id}`}>
+                    <User className='w-4 h-4' /> Profile
+                  </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem className='gap-2'>
                   <Mail className='w-4 h-4' /> Prayer Request

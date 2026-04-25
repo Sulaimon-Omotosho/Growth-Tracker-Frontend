@@ -1,21 +1,21 @@
+'use client'
+
 import AuthForm from '@/components/forms/AuthForm'
 import LoginGoogle from '@/components/LoginGoogle'
-import { cookies } from 'next/headers'
 import Image from 'next/image'
 import { redirect } from 'next/navigation'
 import { Separator } from '@/components/ui/separator'
 import Link from 'next/link'
+import { useMe } from '@/hooks/get-user'
 
-const SignIn = async () => {
-  const cookieStore = await cookies()
-  const accessToken = cookieStore.get('accessToken')?.value
-
-  if (accessToken) redirect('/dashboard')
+const SignIn = () => {
+  const { data, isLoading } = useMe()
+  if (data) redirect('/dashboard')
 
   return (
     <div className='min-h-[calc(100vh-64px)] w-full flex items-center justify-center p-4 md:p-8 bg-gray-50/50 dark:bg-transparent'>
       <section className='w-full max-w-5xl bg-white dark:bg-gray-950 border border-gray-100 dark:border-gray-800 shadow-2xl rounded-3xl overflow-hidden flex flex-col md:flex-row md:min-h-150'>
-        {/* LEFT: Image & Branding (Hidden on small mobile if needed, but looks great here) */}
+        {/* LEFT: Image & Branding  */}
         <div className='relative w-full h-48 md:h-auto md:w-1/2 overflow-hidden'>
           <Image
             src='/assets/Growthtrack-img1.jpg'
@@ -24,7 +24,7 @@ const SignIn = async () => {
             className='object-cover'
             priority
           />
-          {/* Subtle Overlay to make it feel premium */}
+
           <div className='absolute inset-0 bg-linear-to-t from-blue-900/40 to-transparent' />
 
           <div className='absolute bottom-8 left-8 right-8 text-white hidden md:block'>

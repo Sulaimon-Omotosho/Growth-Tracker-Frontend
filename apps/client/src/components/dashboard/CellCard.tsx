@@ -10,7 +10,6 @@ import { getNextMeetingDate } from '@/lib/utils'
 const CellCard = ({ user }: any) => {
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const nextMeeting = getNextMeetingDate()
-  console.log('Cell Card:', user)
 
   const autoResize = () => {
     const el = textareaRef.current

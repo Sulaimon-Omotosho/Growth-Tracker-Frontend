@@ -16,8 +16,11 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
       (error as any)?.status === 401 || (error as any)?.statusCode === 401
 
     if (isError && isUnauthorized) {
-      logout.mutate()
-      return
+      const hasRefreshToken = !!localStorage.getItem('refreshToken')
+
+      if (!hasRefreshToken) {
+        logout.mutate()
+      }
     }
 
     if (!isLoading && user) {
@@ -31,18 +34,6 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
       }
     }
   }, [isError, error, logout, user, isLoading, pathname, router])
-
-  // Loading UI
-  // if (isLoading) {
-  //   return (
-  //     <div className='p-6 animate-pulse'>
-  //       <div className='h-40 w-40 rounded-full bg-gray-300 mb-6' />
-  //       <div className='h-4 w-48 bg-gray-300 mb-2' />
-  //       <div className='h-4 w-32 bg-gray-300 mb-2' />
-  //       <div className='h-4 w-64 bg-gray-300 mb-2' />
-  //     </div>
-  //   )
-  // }
 
   return <>{children}</>
 }

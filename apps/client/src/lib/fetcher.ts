@@ -13,6 +13,7 @@ export async function fetcher(url: string, options: RequestInit = {}) {
   if (res.status === 401 && !url.includes('auth/refresh')) {
     const refreshRes = await fetch(
       `${process.env.NEXT_PUBLIC_API_URL}/auth/refresh`,
+      // `/api/auth/refresh`,
       {
         method: 'POST',
         credentials: 'include',

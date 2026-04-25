@@ -948,34 +948,6 @@ const AppSidebar = () => {
                           />
                         </RightDrawer>
                       </SidebarMenuSubItem>
-                      {/* <SidebarMenuSubItem>
-                        <RightDrawer
-                          trigger={
-                            <SidebarMenuButton className='text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100'>
-                              <Plus size={18} />
-                              <span className='text-sm'>
-                                Create Interest Based
-                              </span>
-                            </SidebarMenuButton>
-                          }
-                          title='Create Interest Based Group'
-                          description='Register a new church interest based Group.'
-                          submitLabel='Save Small Group'
-                          formId='add-small-group'
-                          open={isOpen === 'inba'}
-                          onOpenChange={(open) =>
-                            setIsOpen(open ? 'inba' : null)
-                          }
-                          isLoading={mutations.inba.isPending}
-                          isSubmitDisabled={isSubmitDisabled}
-                        >
-                          <AddSmallGroup
-                            mutation={mutations.inba}
-                            onSuccess={() => setIsOpen(null)}
-                            onValidationChange={setIsSubmitDisabled}
-                          />
-                        </RightDrawer>
-                      </SidebarMenuSubItem> */}
                     </SidebarMenuSub>
                   </CollapsibleContent>
                 </SidebarMenuItem>

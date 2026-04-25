@@ -111,3 +111,32 @@ export const useJoinDept = () => {
     },
   })
 }
+
+// Search Small Group
+export function useSearchSmallGroups(query: string) {
+  return useQuery({
+    queryKey: ['small-groups', 'search', query],
+    queryFn: () => fetcher(`/church/search/small-groups?q=${query}`),
+    enabled: query.length > 2,
+    staleTime: 1000 * 60 * 5,
+  })
+}
+
+// Join Small Group
+export const useJoinSmallGroup = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: async ({ smallGroupId }: { smallGroupId: string }) => {
+      const data = await fetcher(`/church/members/join/small-group`, {
+        method: 'POST',
+        body: JSON.stringify({ smallGroupId }),
+      })
+      return data
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['auth-user'] })
+      toast.success('Small group joined successfully')
+    },
+  })
+}

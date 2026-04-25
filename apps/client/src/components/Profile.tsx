@@ -94,7 +94,7 @@ const Profile = () => {
             className='flex items-center gap-3 cursor-pointer py-2'
           >
             <Settings className='h-4 w-4 text-muted-foreground' />
-            <span className='font-medium text-sm'>Account Settings</span>
+            <span className='font-medium text-sm'>Profile</span>
           </Link>
         </DropdownMenuItem>
 
