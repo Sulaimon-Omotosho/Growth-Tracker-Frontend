@@ -124,7 +124,7 @@ export default function ManagementHub() {
 
         <div className='transition-all duration-300'>
           {ActiveComponent && (
-            <ActiveComponent leadership={getComponentData()} />
+            <ActiveComponent leadership={getComponentData() ?? []} />
           )}
         </div>
       </div>

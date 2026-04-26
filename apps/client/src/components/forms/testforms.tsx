@@ -3,7 +3,6 @@
 import { Eye, EyeClosed, Mail, User } from 'lucide-react'
 import React, { useState } from 'react'
 import SubmitButton from '../SubmitButton'
-import { signIn } from 'next-auth/react'
 import { useForm } from 'react-hook-form'
 import { AuthFormSchema, UserFormSchema, UserSignUpSchema } from '@repo/types'
 import z from 'zod'
@@ -49,39 +48,39 @@ const AuthForm = () => {
 
   const router = useRouter()
 
-  const login = async (data: AuthFormData) => {
-    if (!signUp) {
-      const res = await signIn('credentials', {
-        redirect: false,
-        callbackUrl: '/',
-        email: data.email,
-        password: data.password,
-      })
-      console.log(res)
-      if (res?.ok) {
-        console.log('Credentials login successful')
-      } else {
-        console.error('Login failed:', res?.error)
-      }
-    } else {
-      const res = await fetch('http://localhost:8000/auth/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: data.email, password: data.password }),
-      })
-      if (!res.ok) {
-        throw new Error('Signup failed')
-      }
+  // const login = async (data: AuthFormData) => {
+  //   if (!signUp) {
+  //     const res = await signIn('credentials', {
+  //       redirect: false,
+  //       callbackUrl: '/',
+  //       email: data.email,
+  //       password: data.password,
+  //     })
+  //     console.log(res)
+  //     if (res?.ok) {
+  //       console.log('Credentials login successful')
+  //     } else {
+  //       console.error('Login failed:', res?.error)
+  //     }
+  //   } else {
+  //     const res = await fetch('http://localhost:8000/auth/register', {
+  //       method: 'POST',
+  //       headers: { 'Content-Type': 'application/json' },
+  //       body: JSON.stringify({ email: data.email, password: data.password }),
+  //     })
+  //     if (!res.ok) {
+  //       throw new Error('Signup failed')
+  //     }
 
-      // Auto Login
-      await signIn('credentials', {
-        redirect: false,
-        email: data.email,
-        password: data.password,
-        callbackUrl: '/',
-      })
-    }
-  }
+  //     // Auto Login
+  //     await signIn('credentials', {
+  //       redirect: false,
+  //       email: data.email,
+  //       password: data.password,
+  //       callbackUrl: '/',
+  //     })
+  //   }
+  // }
 
   return (
     <div>
@@ -89,9 +88,7 @@ const AuthForm = () => {
         {signUp ? 'Sign Up' : 'Login'}
       </h1>
       <form
-        onSubmit={handleSubmit(login, (errors) =>
-          console.log('FORM ERRORS:', errors),
-        )}
+        onSubmit={handleSubmit((errors) => console.log('FORM ERRORS:', errors))}
         className='space-y-6 flex-1 bg-transparent'
       >
         {signUp && (

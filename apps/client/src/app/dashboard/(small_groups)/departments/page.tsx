@@ -72,7 +72,7 @@ export default function DepartmentMemberHub() {
             </div>
             <div className='flex items-center gap-2 mt-1 cursor-pointer group'>
               <span className='text-sm font-bold text-blue-600'>
-                {departments[0].name}
+                {departments[0]?.name}
               </span>
               <ChevronDown
                 size={14}
@@ -80,7 +80,7 @@ export default function DepartmentMemberHub() {
               />
               <span className='text-zinc-300 mx-1'>•</span>
               <span className='text-xs text-muted-foreground font-medium'>
-                {departments[0].role}
+                {departments[0]?.role}
               </span>
             </div>
           </div>

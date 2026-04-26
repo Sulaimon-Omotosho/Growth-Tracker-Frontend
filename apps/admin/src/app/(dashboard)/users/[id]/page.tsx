@@ -17,7 +17,6 @@ import {
   MessageSquare,
 } from 'lucide-react'
 
-import { GroupAvatar } from '@/components/dashboard/GroupAvatar'
 import { RightDrawer } from '@/components/dashboard/RightDrawer'
 import ChangeRole from '@/components/forms/ChangeRole'
 import { cn } from '@/lib/utils'
@@ -116,8 +115,14 @@ const ProfilePage = () => {
               </div>
 
               <div className='grid grid-cols-1 sm:grid-cols-2 gap-y-2 pt-2 border-t border-zinc-200/50 dark:border-zinc-700/50'>
-                <InfoItem icon={<Phone size={14} />} label={user.phone} />
-                <InfoItem icon={<Mail size={14} />} label={user.email} />
+                <InfoItem
+                  icon={<Phone size={14} />}
+                  label={user.phone ?? 'N/A'}
+                />
+                <InfoItem
+                  icon={<Mail size={14} />}
+                  label={user.email ?? 'No Email'}
+                />
                 <InfoItem
                   icon={<MapPin size={14} />}
                   label={user.cell?.community?.name || 'Region unknown'}
@@ -226,7 +231,7 @@ const ProfilePage = () => {
           <h2 className='text-[10px] font-black uppercase text-zinc-400 mb-3 text-center'>
             Latest Credential
           </h2>
-          <div className='relative aspect-[4/3] rounded-xl overflow-hidden grayscale hover:grayscale-0 transition-all duration-500 cursor-zoom-in'>
+          <div className='relative aspect-4/3 rounded-xl overflow-hidden grayscale hover:grayscale-0 transition-all duration-500 cursor-zoom-in'>
             <Image
               src='/assets/cert.png'
               alt='Cert'

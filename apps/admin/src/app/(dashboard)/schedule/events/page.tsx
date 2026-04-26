@@ -37,7 +37,7 @@ export default function EventsPage() {
   }
 
   {
-    event?.length === 0 && (
+    ;(event as any)?.length === 0 && (
       <div className='flex flex-col items-center justify-center py-20 text-center border-2 border-dashed rounded-xl border-zinc-200'>
         <Calendar className='h-10 w-10 text-zinc-300 mb-4' />
         <h3 className='font-semibold'>No events scheduled</h3>

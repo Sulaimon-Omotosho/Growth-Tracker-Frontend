@@ -75,7 +75,7 @@ export interface Cell {
   zoneId?: string
   leaderId?: string
   leader?: User
-  community?: Community[]
+  community?: Community
   zone?: Zone
   users?: User[]
 }

@@ -82,7 +82,8 @@ export function NextStepChart() {
             <ChartTooltip
               cursor={false}
               content={
-                <ChartTooltipContent hideLabel nameKey='course' suffix='%' />
+                // <ChartTooltipContent hideLabel nameKey='course' suffix='%' />
+                <ChartTooltipContent hideLabel nameKey='course' />
               }
             />
             <RadialBar

@@ -8,14 +8,14 @@ import { SkeletonTable } from '@/components/Skeleton'
 import { MapPin, Plus, Search, Globe2 } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
-import { District } from '@repo/types'
+import type { District as DistrictType } from '@repo/types'
 
 const District = () => {
   const { data, isLoading, isError } = useGetDistricts()
   const [searchQuery, setSearchQuery] = useState('')
 
   const filteredData =
-    data?.filter((district: District) =>
+    data?.filter((district: DistrictType) =>
       district.name.toLowerCase().includes(searchQuery.toLowerCase()),
     ) ?? []
 

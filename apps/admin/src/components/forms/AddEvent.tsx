@@ -125,7 +125,12 @@ const AddEvent = ({
               render={({ field }) => (
                 <Field>
                   <FieldLabel>Capacity</FieldLabel>
-                  <Input {...field} type='number' placeholder='200' />
+                  <Input
+                    {...field}
+                    value={(field.value as any) ?? ''}
+                    type='number'
+                    placeholder='200'
+                  />
                 </Field>
               )}
             />

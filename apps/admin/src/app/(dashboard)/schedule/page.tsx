@@ -5,7 +5,14 @@ import { Calendar } from '@/components/ui/calendar'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { Plus, Clock, MapPin, MoreVertical, Filter } from 'lucide-react'
+import {
+  Plus,
+  Clock,
+  MapPin,
+  MoreVertical,
+  Filter,
+  Calendar1Icon,
+} from 'lucide-react'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -151,7 +158,7 @@ export default function SchedulePage() {
               ))
             ) : (
               <div className='h-40 flex flex-col items-center justify-center border-2 border-dashed rounded-xl opacity-50'>
-                <Calendar size={32} className='mb-2' />
+                <Calendar1Icon size={32} className='mb-2' />
                 <p>No events scheduled for this day</p>
               </div>
             )}

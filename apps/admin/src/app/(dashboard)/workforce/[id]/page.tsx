@@ -9,6 +9,7 @@ import { useParams } from 'next/navigation'
 import { LayoutGrid, Plus, Search, ChevronRight } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
+import { Department } from '@repo/types'
 
 const Departments = () => {
   const params = useParams()
@@ -17,7 +18,7 @@ const Departments = () => {
   const [searchQuery, setSearchQuery] = useState('')
 
   const filteredData =
-    data?.filter((dept) =>
+    data?.filter((dept: Department) =>
       dept.name.toLowerCase().includes(searchQuery.toLowerCase()),
     ) ?? []
 
