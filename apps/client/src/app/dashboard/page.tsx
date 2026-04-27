@@ -10,12 +10,12 @@ import { useUser } from '@/utils/userContext'
 import { redirect } from 'next/navigation'
 import { AnnouncementCard } from '@/components/dashboard/AnnouncementCard'
 import { MessageCard } from '@/components/dashboard/MessageCard'
-import { MOCK_ANNOUNCEMENTS, MOCK_MESSAGES } from '@/lib/mock'
+import { MOCK_MESSAGES } from '@/lib/mock'
 import { useAnnouncements } from '@/hooks/get-events'
 
 const UserDashboard = () => {
   const { user, isLoading } = useUser()
-  console.log('Dashboard:', user)
+  // console.log('Dashboard:', user)
 
   const { data: announcements, isLoading: announcementsLoading } =
     useAnnouncements()

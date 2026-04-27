@@ -11,8 +11,6 @@ export const getNextMeetingDate = () => {
 
   nextSunday.setDate(now.getDate() + ((7 - now.getDay()) % 7))
 
-  // if (now.getDay() === 0) nextSunday.setDate(nextSunday.getDate() + 7);
-
   const isLastSunday = (date: Date) => {
     const d = new Date(date)
     d.setDate(d.getDate() + 7)

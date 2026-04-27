@@ -1,6 +1,6 @@
 'use client'
 
-import React from 'react'
+import React, { useState } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -16,25 +16,39 @@ import {
   ChevronDown,
   Layers,
   ArrowRight,
+  Mail,
 } from 'lucide-react'
+import { useMyDepartments } from '@/hooks/get-church'
+import { DepartmentSkeleton } from '@/components/skeletons/DepartmentSkeleton'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
+import {
+  ReportDialog,
+  RosterDialog,
+} from '@/components/dashboard/RoasterAndReport'
 
 export default function DepartmentMemberHub() {
-  // Mock state for multiple departments
-  const departments = [
-    {
-      id: 1,
-      name: 'Media & Tech',
-      role: 'Camera Operator',
-      color: 'bg-blue-600',
-    },
-    {
-      id: 2,
-      name: 'Music & Choir',
-      role: 'Tenor Vocalist',
-      color: 'bg-purple-600',
-    },
-  ]
+  const { data: myDepartments, isLoading, isError } = useMyDepartments()
+  // console.log('Departments Data:', myDepartments)
+  const [selectedDeptIndex, setSelectedDeptIndex] = useState(0)
 
+  if (isLoading) return <DepartmentSkeleton />
+  if (isError || !myDepartments || myDepartments.length === 0) {
+    return (
+      <div className='p-10 text-center font-bold'>
+        No department data found.
+      </div>
+    )
+  }
+
+  const currentDept = myDepartments[selectedDeptIndex]
+
+  // Mock state for multiple departments
   const activeTasks = [
     {
       id: 1,
@@ -51,8 +65,8 @@ export default function DepartmentMemberHub() {
   ]
 
   return (
-    <div className='max-w-5xl mx-auto space-y-6 animate-in fade-in duration-500 pb-20'>
-      {/* --- 1. DEPARTMENT SWITCHER & ROLE --- */}
+    <div className='max-w-5xl mx-auto space-y-6 animate-in fade-in duration-500 pb-20 mt-2'>
+      {/* ---  DEPARTMENT SWITCHER & ROLE --- */}
       <div className='flex flex-col md:flex-row md:items-center justify-between gap-4'>
         <div className='flex items-center gap-4'>
           <div className='p-3 bg-zinc-900 rounded-2xl text-white shadow-xl'>
@@ -67,40 +81,80 @@ export default function DepartmentMemberHub() {
                 variant='secondary'
                 className='rounded-full text-[10px] bg-zinc-100 uppercase font-bold'
               >
-                {departments.length} Active Units
+                {myDepartments?.length} Active Units
               </Badge>
             </div>
-            <div className='flex items-center gap-2 mt-1 cursor-pointer group'>
-              <span className='text-sm font-bold text-blue-600'>
-                {departments[0]?.name}
-              </span>
-              <ChevronDown
-                size={14}
-                className='text-zinc-400 group-hover:text-blue-600 transition-colors'
-              />
+            <div className='flex items-center gap-2 mt-1'>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <div className='flex items-center gap-2 cursor-pointer group'>
+                    <span className='text-sm font-bold text-blue-600'>
+                      {currentDept?.name}
+                    </span>
+                    {myDepartments.length > 1 && (
+                      <ChevronDown
+                        size={14}
+                        className='text-zinc-400 group-hover:text-blue-600 transition-colors'
+                      />
+                    )}
+                  </div>
+                </DropdownMenuTrigger>
+
+                <DropdownMenuContent
+                  align='start'
+                  className='rounded-xl border-none shadow-xl bg-white p-2'
+                >
+                  {myDepartments.map((dept, index) => (
+                    <DropdownMenuItem
+                      key={dept.id}
+                      onClick={() => setSelectedDeptIndex(index)}
+                      className={`rounded-lg cursor-pointer font-bold text-xs px-4 py-2 ${
+                        index === selectedDeptIndex
+                          ? 'bg-blue-50 text-blue-600'
+                          : 'text-zinc-600'
+                      }`}
+                    >
+                      {dept.name}
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+
               <span className='text-zinc-300 mx-1'>•</span>
               <span className='text-xs text-muted-foreground font-medium'>
-                {departments[0]?.role}
+                Member
               </span>
             </div>
           </div>
         </div>
 
         <div className='flex gap-2'>
-          <Button
-            variant='outline'
-            className='rounded-xl font-bold text-xs h-10'
-          >
-            View My Roster
-          </Button>
-          <Button className='bg-zinc-900 rounded-xl font-bold text-xs h-10'>
-            Submit Report
-          </Button>
+          <RosterDialog
+            deptName={currentDept?.name || ''}
+            members={currentDept?.users || []} // Assuming users are returned in the dept data
+            trigger={
+              <Button
+                variant='outline'
+                className='rounded-xl font-bold text-xs h-10'
+              >
+                View My Roster
+              </Button>
+            }
+          />
+
+          <ReportDialog
+            deptName={currentDept?.name || ''}
+            trigger={
+              <Button className='bg-zinc-900 rounded-xl font-bold text-xs h-10'>
+                Submit Report
+              </Button>
+            }
+          />
         </div>
       </div>
 
       <div className='grid grid-cols-1 lg:grid-cols-3 gap-6'>
-        {/* --- 2. MY ASSIGNMENTS (THE "DO" LIST) --- */}
+        {/* --- ASSIGNMENTS --- */}
         <Card className='lg:col-span-2 rounded-3xl border-none shadow-sm'>
           <CardHeader className='border-b pb-4'>
             <div className='flex items-center justify-between'>
@@ -161,7 +215,7 @@ export default function DepartmentMemberHub() {
           </CardContent>
         </Card>
 
-        {/* --- 3. DEPARTMENTAL INTEL --- */}
+        {/* --- DEPARTMENTAL INTEL --- */}
         <div className='space-y-6'>
           <Card className='rounded-3xl shadow-sm border-none bg-blue-600 text-white overflow-hidden relative'>
             <div className='absolute right-0 top-0 p-4 opacity-20'>
@@ -169,17 +223,17 @@ export default function DepartmentMemberHub() {
             </div>
             <CardContent className='p-6'>
               <p className='text-[10px] font-black uppercase tracking-widest opacity-70'>
-                Current Unit Focus
+                Description
               </p>
-              <h3 className='text-xl font-black mt-2 leading-tight'>
-                Easter Stream Reliability Audit
+              <h3 className='text-sm font-bold mt-2 leading-tight'>
+                {currentDept?.description || 'Active department unit focus.'}
               </h3>
               <div className='mt-6 space-y-2'>
                 <div className='flex justify-between text-[10px] font-bold uppercase'>
-                  <span>Unit Progress</span>
-                  <span>68%</span>
+                  <span>Active Members</span>
+                  <span>{currentDept?._count?.members || 0}</span>
                 </div>
-                <Progress value={68} className='h-1.5 bg-blue-400/30' />
+                <Progress value={100} className='h-1.5 bg-blue-400/30' />
               </div>
             </CardContent>
           </Card>
@@ -214,25 +268,35 @@ export default function DepartmentMemberHub() {
             </CardContent>
           </Card>
 
+          {/* --- LEADER CARD --- */}
           <Card className='rounded-3xl shadow-sm border-none bg-zinc-900 text-white'>
             <CardContent className='p-6'>
               <div className='flex items-center gap-3'>
-                <div className='h-10 w-10 rounded-full bg-zinc-800 flex items-center justify-center'>
-                  <Users2 size={18} className='text-zinc-400' />
-                </div>
+                <Avatar className='h-12 w-12 border-2 border-zinc-800 shadow-xl'>
+                  <AvatarImage src={currentDept?.leader?.image} />
+                  <AvatarFallback className='bg-zinc-800 text-xs'>
+                    {currentDept?.leader?.firstName?.[0]}
+                    {currentDept?.leader?.lastName?.[0]}
+                  </AvatarFallback>
+                </Avatar>
                 <div>
-                  <p className='text-xs font-black uppercase tracking-tighter'>
+                  <p className='text-xs font-black uppercase tracking-tighter text-zinc-500'>
                     Unit Leader
                   </p>
-                  <p className='text-sm font-bold'>David Oladapo</p>
+                  <p className='text-sm font-bold'>
+                    {currentDept?.leader?.firstName}{' '}
+                    {currentDept?.leader?.lastName}
+                  </p>
                 </div>
               </div>
-              <Button
-                variant='outline'
-                className='w-full mt-6 rounded-xl border-zinc-700 bg-transparent hover:bg-zinc-800 text-xs font-bold h-11 border-2'
-              >
-                Message Lead
-              </Button>
+              <a href={`mailto:${currentDept?.email}`}>
+                <Button
+                  variant='outline'
+                  className='w-full mt-6 rounded-xl border-zinc-700 bg-transparent hover:bg-zinc-500 text-xs font-bold h-11 border-2 gap-2'
+                >
+                  <Mail size={14} /> Message Lead
+                </Button>
+              </a>
             </CardContent>
           </Card>
         </div>

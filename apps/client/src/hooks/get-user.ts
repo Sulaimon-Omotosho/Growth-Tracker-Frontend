@@ -1,5 +1,5 @@
 import { fetcher } from '@/lib/fetcher'
-import { User } from '@repo/types'
+import { User, UserGroupsData } from '@repo/types'
 import { useQuery } from '@tanstack/react-query'
 
 // Get Me
@@ -17,7 +17,7 @@ export function useMe() {
 }
 
 export function useGetSmallGroups() {
-  return useQuery({
+  return useQuery<UserGroupsData>({
     queryKey: ['user-groups', 'me'],
     queryFn: async () => {
       const data = await fetcher('/users/me/groups')

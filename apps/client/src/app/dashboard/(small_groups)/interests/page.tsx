@@ -20,19 +20,44 @@ import {
 } from 'lucide-react'
 import { RightDrawer } from '@/components/dashboard/RightDrawer'
 import JoinSmallGroup from '@/components/forms/JoinSmallGroup'
-import { myGroups } from '@/lib/mock'
+import { myGroups as groupsM } from '@/lib/mock'
 import { useJoinSmallGroup } from '@/hooks/use-church'
 import { useUser } from '@/utils/userContext'
+import { useMySmallGroups } from '@/hooks/get-church'
+import { InterestSkeleton } from '@/components/skeletons/InterestSkeleton'
 
 export default function InterestGroupHub() {
-  const { user } = useUser()
+  // const { user } = useUser()
+  const { data: myGroups, isLoading } = useMySmallGroups()
+  // console.log('Small Group:', myGroups)
+
+  const [selectedGroupIndex, setSelectedGroupIndex] = useState(0)
   const [isSubmitDisabled, setIsSubmitDisabled] = useState(true)
   const [isOpen, setIsOpen] = useState<'smg' | null>(null)
   const joinSMG = useJoinSmallGroup()
 
+  if (isLoading) return <InterestSkeleton />
+  if (!myGroups || myGroups.length === 0)
+    return (
+      <div className='flex flex-col items-center justify-center py-20 text-center space-y-4 animate-in fade-in zoom-in duration-500'>
+        <div className='h-20 w-20 bg-zinc-50 rounded-full flex items-center justify-center'>
+          <Compass size={40} className='text-zinc-300' />
+        </div>
+        <div className='space-y-1'>
+          <h3 className='text-lg font-black tracking-tight'>No Groups Found</h3>
+          <p className='text-sm text-zinc-500 max-w-62.5 mx-auto font-medium'>
+            You haven't joined any interest groups yet. Click the "Join" button
+            above to get started!
+          </p>
+        </div>
+      </div>
+    )
+
+  const currentGroup = myGroups[selectedGroupIndex]
+
   return (
     <div className='max-w-6xl mx-auto space-y-8 animate-in fade-in duration-700 pb-20 pt-2'>
-      {/* --- 1. THE HORIZONTAL GROUP SWITCHER --- */}
+      {/* --- GROUP SWITCHER --- */}
       <div className='flex items-center gap-4 overflow-x-auto pb-4 no-scrollbar pt-3'>
         <RightDrawer
           trigger={
@@ -43,9 +68,6 @@ export default function InterestGroupHub() {
               <PlusCircle size={20} className='text-zinc-400' />
               <span className='text-[10px] font-bold uppercase'>Join</span>
             </Button>
-            // <SidebarMenuAction>
-            //   <Plus />
-            // </SidebarMenuAction>
           }
           title='Join Small Group'
           open={isOpen === 'smg'}
@@ -56,35 +78,35 @@ export default function InterestGroupHub() {
           isSubmitDisabled={isSubmitDisabled}
         >
           <JoinSmallGroup
-            user={user!}
+            myGroups={myGroups!}
             mutation={joinSMG}
             onSuccess={() => setIsOpen(null)}
             onValidationChange={setIsSubmitDisabled}
           />
         </RightDrawer>
-        {/* <Button
-          variant='outline'
-          className='flex-shrink-0 h-20 w-20 rounded-3xl border-dashed border-2 flex flex-col gap-1 border-zinc-300'
-        >
-          <PlusCircle size={20} className='text-zinc-400' />
-          <span className='text-[10px] font-bold uppercase'>Join</span>
-        </Button> */}
-        {myGroups.map((group) => (
+
+        {myGroups.map((group, index) => (
           <div
             key={group.id}
+            onClick={() => setSelectedGroupIndex(index)}
             className='relative group cursor-pointer shrink-0'
           >
             <div
-              className={`h-20 w-20 rounded-3xl bg-linear-to-br ${group.color} shadow-lg transition-transform group-hover:scale-105 flex items-center justify-center text-white font-black text-xl`}
+              className={`h-20 w-20 rounded-3xl transition-all flex items-center justify-center text-white font-black text-xl shadow-lg
+                ${index === selectedGroupIndex ? 'scale-110 ring-4 ring-blue-100' : 'opacity-70 hover:opacity-100'}
+                bg-linear-to-br ${group.color || 'from-zinc-400 to-zinc-600'}`}
             >
               {group.name.charAt(0)}
             </div>
-            {group.updates > 0 && (
+            {/* {group.updates > 0 && (
               <div className='absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-black h-6 w-6 rounded-full border-4 border-white flex items-center justify-center'>
                 {group.updates}
               </div>
-            )}
-            <p className='text-[10px] text-center mt-2 font-black uppercase tracking-tighter text-zinc-500 truncate w-20'>
+            )} */}
+            <p
+              className={`text-[10px] text-center mt-2 font-black uppercase tracking-tighter truncate w-20 
+              ${index === selectedGroupIndex ? 'text-blue-600' : 'text-zinc-500'}`}
+            >
               {group.name}
             </p>
           </div>
@@ -92,7 +114,7 @@ export default function InterestGroupHub() {
       </div>
 
       <div className='grid grid-cols-1 lg:grid-cols-4 gap-8'>
-        {/* --- 2. MAIN FEED (THE "CURIOSITY" STREAM) --- */}
+        {/* --- MAIN FEED --- */}
         <div className='lg:col-span-3 space-y-6'>
           <div className='flex items-center justify-between'>
             <h2 className='text-2xl font-black tracking-tighter flex items-center gap-2'>
@@ -194,7 +216,7 @@ export default function InterestGroupHub() {
           ))}
         </div>
 
-        {/* --- 3. THE "SIDESHOW" (RESOURCES & COMMUNITY) --- */}
+        {/* --- RESOURCES & COMMUNITY --- */}
         <div className='space-y-6'>
           <Card className='rounded-3xl border-none bg-zinc-900 text-white overflow-hidden'>
             <CardHeader className='pb-2'>

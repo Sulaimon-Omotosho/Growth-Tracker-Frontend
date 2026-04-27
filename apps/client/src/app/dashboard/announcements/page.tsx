@@ -15,6 +15,7 @@ const SCOPES = [
   'COMMUNITY',
   'TEAM',
   'DEPARTMENT',
+  'SMALL_GROUP',
 ]
 
 export default function AnnouncementsPage() {

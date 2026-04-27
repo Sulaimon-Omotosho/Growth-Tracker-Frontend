@@ -10,17 +10,13 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
   const logout = useLogout()
   const router = useRouter()
   const pathname = usePathname()
-
   useEffect(() => {
     const isUnauthorized =
       (error as any)?.status === 401 || (error as any)?.statusCode === 401
 
     if (isError && isUnauthorized) {
-      const hasRefreshToken = !!localStorage.getItem('refreshToken')
-
-      if (!hasRefreshToken) {
-        logout.mutate()
-      }
+      logout.mutate()
+      return
     }
 
     if (!isLoading && user) {
@@ -33,7 +29,10 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
         router.push('/dashboard')
       }
     }
-  }, [isError, error, logout, user, isLoading, pathname, router])
 
+    if (!isLoading && !user && !isError && pathname !== '/login') {
+      router.push('/login')
+    }
+  }, [isError, error, logout, user, isLoading, pathname, router])
   return <>{children}</>
 }

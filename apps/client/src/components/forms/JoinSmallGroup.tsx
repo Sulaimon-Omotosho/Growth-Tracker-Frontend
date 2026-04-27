@@ -159,7 +159,7 @@ import { AddFormProps } from '@/lib/types'
 type SMGFormValues = z.infer<typeof JoinSmallGroupSchema>
 
 const JoinSmallGroup = ({
-  user,
+  myGroups,
   onSuccess,
   mutation,
   onValidationChange,
@@ -177,7 +177,8 @@ const JoinSmallGroup = ({
   const { data: smallGroups, isFetching: isLoading } =
     useSearchSmallGroups(debouncedSearch)
 
-  const smgCount = user?.smallGroups?.length || 0
+  // const smgCount = user?.smallGroups?.length || 0
+  const smgCount = myGroups?.length || 0
   const isAtLimit = smgCount >= 2
 
   useEffect(() => {
@@ -213,7 +214,7 @@ const JoinSmallGroup = ({
           control={form.control}
           render={({ field, fieldState }) => (
             <Field className='relative' data-invalid={fieldState.invalid}>
-              <FieldLabel htmlFor='smallGroupId'>Life Group</FieldLabel>
+              <FieldLabel htmlFor='smallGroupId'>Interest Based</FieldLabel>
               <Input
                 placeholder='Search by name or interest...'
                 value={smgSearch}

@@ -16,7 +16,7 @@ const GroupSkeleton = () => (
 
 const DepartmentsNSmallGroups = () => {
   const { data, isLoading, isError } = useGetSmallGroups()
-  console.log('DNSGroups:', data)
+  // console.log('DNSGroups:', data)
 
   if (isLoading) return <GroupSkeleton />
 

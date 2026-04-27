@@ -2,7 +2,6 @@
 
 import CoursesnActivitiesSummary from '@/components/dashboard/CoursesnActivitiesSummary'
 import DepartmentsNSmallGroups from '@/components/dashboard/DepartmentsNSmallGroups'
-import { GroupAvatar } from '@/components/dashboard/GroupAvatar'
 import { NextStepChart } from '@/components/dashboard/NextStepChart'
 import { RightDrawer } from '@/components/dashboard/RightDrawer'
 import UserForm from '@/components/forms/UserForm'

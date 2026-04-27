@@ -1,4 +1,4 @@
-import { User } from './users'
+import { Address, User } from './users'
 
 export type Teams = {
   id: string
@@ -27,7 +27,11 @@ export type Department = {
   status: string
   churchTeam?: Teams
   members?: User[]
-  membersCount: number
+  users?: User[]
+  membersCount?: number
+  _count?: {
+    members: number
+  }
 }
 
 export type District = {
@@ -56,6 +60,7 @@ export type Community = {
   status: string
   membersCount: number
   location: string
+  district: District
 }
 
 export interface Zone {
@@ -78,6 +83,9 @@ export interface Cell {
   community?: Community
   zone?: Zone
   users?: User[]
+  _count?: any
+  isOnline?: boolean
+  address?: Address
 }
 
 export interface SmallGroup {
@@ -90,4 +98,12 @@ export interface SmallGroup {
   community?: Community[]
   zone?: Zone
   members?: User[]
+  color?: string
+  updates?: number
+}
+
+export interface UserGroupsData {
+  cell?: Cell
+  departments: Department[]
+  smallGroups: SmallGroup[]
 }
