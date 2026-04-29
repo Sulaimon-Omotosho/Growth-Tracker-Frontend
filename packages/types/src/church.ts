@@ -107,3 +107,56 @@ export interface UserGroupsData {
   departments: Department[]
   smallGroups: SmallGroup[]
 }
+
+export interface Course {
+  id: String
+  title: String
+  description?: String
+  thumbnail?: String
+  isActive?: Boolean
+  totalSessions: Number
+  category?: String
+  prerequisiteId?: String
+  prerequisite?: Course
+  nextCourses: Course[]
+  sessions: CourseSession[]
+  enrollments: CourseEnrollment[]
+}
+
+export interface CourseSession {
+  id: String
+  courseId: String
+  title: String
+  description?: String
+  order: Number
+  maxGrade: Number
+  passGrade: Number
+  videoUrl?: String
+  pdfUrl?: String
+
+  course: Course
+  // attendance:  SessionAttendance[]
+}
+
+export interface CourseEnrollment {
+  id: String
+  userId: String
+  courseId: String
+  status: CourseStatus
+
+  progress: Number
+
+  finalGrade?: any
+
+  startDate: string
+  completedAt?: string
+
+  user: User
+  course: Course
+}
+export const enum CourseStatus {
+  NOT_STARTED,
+  IN_PROGRESS,
+  COMPLETED,
+  DROPPED,
+}

@@ -17,7 +17,7 @@ const Members = () => {
   const { data, isLoading, isError } = useGetDepartmentMembers(id)
   const [searchQuery, setSearchQuery] = useState('')
 
-  const membersList = data?.members ?? []
+  const membersList = (data as any)?.members ?? []
   const filteredData = membersList.filter((user: User) =>
     `${user.firstName} ${user.lastName}`
       .toLowerCase()

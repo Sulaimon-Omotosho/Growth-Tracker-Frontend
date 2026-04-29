@@ -131,7 +131,7 @@ export default function DepartmentMemberHub() {
         <div className='flex gap-2'>
           <RosterDialog
             deptName={currentDept?.name || ''}
-            members={currentDept?.users || []} // Assuming users are returned in the dept data
+            members={currentDept?.users || []}
             trigger={
               <Button
                 variant='outline'

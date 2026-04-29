@@ -17,7 +17,7 @@ const Members = () => {
   const { data, isLoading, isError } = useGetCellMembers(cellId)
   const [searchQuery, setSearchQuery] = useState('')
 
-  const membersList = data?.users ?? []
+  const membersList = (data as any)?.users ?? []
   const filteredData = membersList.filter((user: User) =>
     `${user.firstName} ${user.lastName}`
       .toLowerCase()

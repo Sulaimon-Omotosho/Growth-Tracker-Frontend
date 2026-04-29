@@ -1,14 +1,19 @@
+'use client'
+
 import { ModeToggle } from '@/components/ThemeToggle'
-import { cookies } from 'next/headers'
+// import { cookies } from 'next/headers'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { ShieldCheck, ArrowRight } from 'lucide-react'
+import { useMe } from '@/hooks/use-user'
 
-export default async function AdminLanding() {
-  const cookieStore = await cookies()
-  const accessToken = cookieStore.get('accessToken')?.value
+export default function AdminLanding() {
+  // export default async function AdminLanding() {
+  // const cookieStore = await cookies()
+  // const accessToken = cookieStore.get('accessToken')?.value
+  const { data, isLoading } = useMe()
 
-  if (accessToken) {
+  if (data) {
     redirect('/admin')
   }
 

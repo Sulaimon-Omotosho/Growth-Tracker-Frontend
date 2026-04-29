@@ -12,10 +12,6 @@ export default async function AdminLayout({
   children: React.ReactNode
 }>) {
   const cookieStore = await cookies()
-  const accessToken = cookieStore.get('accessToken')?.value
-
-  if (!accessToken) redirect('/')
-
   const defaultOpen = cookieStore.get('sidebar_state')?.value === 'true'
 
   return (

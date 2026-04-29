@@ -1,202 +1,386 @@
 'use client'
 
 import { zodResolver } from '@hookform/resolvers/zod'
-import { DistrictSchema, User, UserFormSchema } from '@repo/types'
-import { Controller, useForm } from 'react-hook-form'
+import { CourseSchema } from '@repo/types'
+import { Controller, useFieldArray, useForm } from 'react-hook-form'
 import z from 'zod'
-
-import { Button } from '@/components/ui/button'
-import { Checkbox } from '@/components/ui/checkbox'
 import {
   Field,
-  FieldContent,
-  FieldDescription,
   FieldError,
   FieldGroup,
   FieldLabel,
-  FieldLegend,
-  FieldSeparator,
-  FieldSet,
 } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
-import { useRouter } from 'next/navigation'
-import { useEffect, useState } from 'react'
-import { toast } from 'sonner'
+import { Button } from '@/components/ui/button'
+import { useEffect } from 'react'
+import { Plus, Trash2, BookOpen } from 'lucide-react'
+import { AddFormProps } from './AddTeam'
 
-const AddCourse = () => {
-  const [query, setQuery] = useState('')
-  const [users, setUsers] = useState<User[]>([])
-  const [loading, setLoading] = useState(false)
-  const [selectedUser, setSelectedUser] = useState<User | null>(null)
-  const router = useRouter()
+type CourseFormValues = z.infer<typeof CourseSchema>
 
-  const now = new Date()
-  const date = now.toLocaleDateString()
-  const time = now.toLocaleTimeString()
-
-  // useEffect(() => {
-  //   if (!query || selectedUser) {
-  //     setUsers([])
-  //     return
-  //   }
-
-  //   const timeout = setTimeout(() => {
-  //     const controller = new AbortController()
-
-  //     async function fetchUsers() {
-  //       setLoading(true)
-  //       const res = await fetch(
-  //         `${process.env.NEXT_PUBLIC_USERS_SERVICE_URL}/users/searchUser?q=${query}`,
-  //         {
-  //           credentials: 'include',
-  //           signal: controller.signal,
-  //         },
-  //       )
-
-  //       const data = await res.json()
-  //       // console.log('Search Response:', data)
-  //       setUsers(Array.isArray(data) ? data : [])
-  //       setLoading(false)
-  //     }
-
-  //     fetchUsers()
-  //     return () => controller.abort()
-  //   }, 300)
-
-  //   return () => clearTimeout(timeout)
-  // }, [query, selectedUser])
-
-  const form = useForm<z.input<typeof DistrictSchema>>({
-    resolver: zodResolver(DistrictSchema),
+const AddCourse = ({
+  onSuccess,
+  mutation,
+  onValidationChange,
+}: AddFormProps) => {
+  const form = useForm<z.infer<typeof CourseSchema>>({
+    resolver: zodResolver(CourseSchema) as any,
     defaultValues: {
-      name: '',
-      leaderId: '',
+      title: '',
+      description: '',
+      category: '',
+      sessions: [{ title: '', description: '', maxGrade: 100, passGrade: 50 }],
     },
   })
 
-  async function onSubmit(data: z.output<typeof DistrictSchema>) {
-    console.log('District Form', data)
+  const {
+    control,
+    handleSubmit,
+    formState: { isValid },
+  } = form
 
-    // try {
-    //   const res = await fetch(
-    //     `${process.env.NEXT_PUBLIC_USERS_SERVICE_URL}/church/addDistrict`,
-    //     {
-    //       method: 'POST',
-    //       credentials: 'include',
-    //       headers: {
-    //         'Content-Type': 'application/json',
-    //       },
-    //       body: JSON.stringify(data),
-    //     },
-    //   )
+  // Dynamic fields for sessions
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: 'sessions',
+  })
 
-    //   if (!res.ok) {
-    //     throw new Error('Failed to create district')
-    //   }
+  useEffect(() => {
+    onValidationChange?.(!isValid)
+  }, [isValid, onValidationChange])
 
-    //   const newDistrict = await res.json()
-    //   toast(`${newDistrict.name} has been created`, {
-    //     description: `On ${date} at ${time}`,
-    //   })
+  const onSubmit = (data: CourseFormValues) => {
+    console.log('Course Form:', data)
 
-    //   setTimeout(() => {
-    //     window.location.reload()
-    //   }, 3000)
-    // } catch (err) {
-    //   toast.error('District has not been created')
-    // }
+    mutation.mutate(data, {
+      onSuccess: () => {
+        form.reset()
+        onSuccess?.()
+      },
+    })
   }
 
   return (
-    <div className='w-full sm:max-w-md no-scrollbar'>
-      <form id='add-district' onSubmit={form.handleSubmit(onSubmit as any)}>
+    <div className='w-full no-scrollbar'>
+      <form
+        id='add-course'
+        onSubmit={handleSubmit(onSubmit as any)}
+        className='space-y-8'
+      >
         <FieldGroup>
-          {/* <Controller
-            name='name'
-            control={form.control}
-            render={({ field, fieldState }) => (
-              <Field data-invalid={fieldState.invalid}>
-                <FieldLabel htmlFor='name'>District Name</FieldLabel>
-                <Input
+          {/* --- COURSE INFO --- */}
+          <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+            <Controller
+              name='title'
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel>Course Title</FieldLabel>
+                  <Input {...field} placeholder='e.g. Foundation School' />
+                  {fieldState.error && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
+                </Field>
+              )}
+            />
+            <Controller
+              name='category'
+              control={control}
+              render={({ field }) => (
+                <Field>
+                  <FieldLabel>Category</FieldLabel>
+                  <Input {...field} placeholder='e.g. Discipleship' />
+                </Field>
+              )}
+            />
+          </div>
+
+          <Controller
+            name='description'
+            control={control}
+            render={({ field }) => (
+              <Field>
+                <FieldLabel>Description</FieldLabel>
+                <Textarea
                   {...field}
-                  id='name'
-                  aria-invalid={fieldState.invalid}
-                  // placeholder='John'
+                  placeholder='What will students learn?'
+                  className='min-h-20'
                 />
-                {fieldState.invalid && (
-                  <FieldError errors={[fieldState.error]} />
-                )}
               </Field>
             )}
           />
-          <Controller
-            name='leaderId'
-            control={form.control}
-            render={({ field, fieldState }) => (
-              <Field data-invalid={fieldState.invalid}>
-                <FieldLabel htmlFor='leaderId'>Pastor</FieldLabel>
 
-                <Input
-                  placeholder='Search Pastor...'
-                  value={query}
-                  onChange={(e) => {
-                    setQuery(e.target.value)
-                    setSelectedUser(null)
-                  }}
-                />
+          <hr className='border-zinc-100' />
 
-                {query && !selectedUser && (
-                  <div className='mt-2 rounded border bg-background max-h-48 overflow-y-auto'>
-                    {loading && (
-                      <p className='p-2 text-sm text-muted-foreground'>
-                        Searching...
-                      </p>
-                    )}
+          {/* --- SESSIONS SECTION --- */}
+          {/* <div className='space-y-4'>
+            <div className='flex items-center justify-between'>
+              <h3 className='text-sm font-black uppercase tracking-widest text-zinc-400 flex items-center gap-2'>
+                <BookOpen size={14} /> Curriculum Sessions
+              </h3>
+              <Button
+                type='button'
+                variant='outline'
+                size='sm'
+                onClick={() =>
+                  append({ title: '', maxGrade: 100, passGrade: 50 })
+                }
+                className='h-8 rounded-lg text-[10px] font-bold'
+              >
+                <Plus size={14} className='mr-1' /> Add Session
+              </Button>
+            </div>
 
-                    {!loading && users.length === 0 && query && (
-                      <p className='p-2 text-sm text-muted-foreground'>
-                        None found
-                      </p>
-                    )}
+            <div className='space-y-3'>
+              {fields.map((item, index) => (
+                <div
+                  key={item.id}
+                  className='p-4 rounded-2xl bg-zinc-50 border border-zinc-100 relative group animate-in slide-in-from-top-2 duration-300'
+                >
+                  <div className='grid grid-cols-1 md:grid-cols-12 gap-3 items-end'>
+                    <div className='md:col-span-1'>
+                      <span className='flex h-8 w-8 items-center justify-center rounded-full bg-zinc-200 text-[10px] font-black'>
+                        {index + 1}
+                      </span>
+                    </div>
 
-                    {Array.isArray(users) &&
-                      users.map((user) => {
-                        const fullName = `${user.firstName} ${user.lastName}`
+                    <div className='md:col-span-5'>
+                      <Controller
+                        name={`sessions.${index}.title`}
+                        control={control}
+                        render={({ field }) => (
+                          <div className='space-y-1'>
+                            <label className='text-[10px] font-bold text-zinc-400'>
+                              Session Title
+                            </label>
+                            <Input
+                              {...field}
+                              className='bg-white'
+                              placeholder='Session Title'
+                            />
+                          </div>
+                        )}
+                      />
+                    </div>
 
-                        return (
-                          <button
-                            key={user.id}
-                            type='button'
-                            className='block w-full text-left p-2 hover:bg-muted'
-                            onClick={() => {
-                              field.onChange(user.id)
-                              setQuery(fullName)
-                              setSelectedUser(user)
-                              setUsers([])
-                            }}
-                          >
-                            <p className='font-medium'>{fullName}</p>
-                          </button>
-                        )
-                      })}
+                    <div className='md:col-span-5'>
+                      <Controller
+                        name={`sessions.${index}.description`}
+                        control={control}
+                        render={({ field }) => (
+                          <div className='space-y-1'>
+                            <label className='text-[10px] font-bold text-zinc-400'>
+                              Session description
+                            </label>
+                            <Textarea
+                              {...field}
+                              placeholder='What will students learn?'
+                              className='min-h-20'
+                            />
+                          </div>
+                        )}
+                      />
+                    </div>
+
+                    <div className='md:col-span-2'>
+                      <Controller
+                        name={`sessions.${index}.maxGrade`}
+                        control={control}
+                        render={({ field }) => (
+                          <div className='space-y-1'>
+                            <label className='text-[10px] font-bold text-zinc-400'>
+                              Max Score
+                            </label>
+                            <Input
+                              {...field}
+                              type='number'
+                              className='bg-white'
+                              onChange={(e) =>
+                                field.onChange(parseInt(e.target.value))
+                              }
+                            />
+                          </div>
+                        )}
+                      />
+                    </div>
+
+                    <div className='md:col-span-2'>
+                      <Controller
+                        name={`sessions.${index}.passGrade`}
+                        control={control}
+                        render={({ field }) => (
+                          <div className='space-y-1'>
+                            <label className='text-[10px] font-bold text-zinc-400'>
+                              Pass Mark
+                            </label>
+                            <Input
+                              {...field}
+                              type='number'
+                              className='bg-white'
+                              onChange={(e) =>
+                                field.onChange(parseInt(e.target.value))
+                              }
+                            />
+                          </div>
+                        )}
+                      />
+                    </div>
+
+                    <div className='md:col-span-2 flex justify-end'>
+                      {fields.length > 1 && (
+                        <Button
+                          type='button'
+                          variant='ghost'
+                          size='icon'
+                          onClick={() => remove(index)}
+                          className='text-zinc-400 hover:text-red-500 hover:bg-red-50 rounded-xl'
+                        >
+                          <Trash2 size={16} />
+                        </Button>
+                      )}
+                    </div>
                   </div>
-                )}
-                <input type='hidden' value={field.value ?? ''} />
-                {fieldState.invalid && (
-                  <FieldError errors={[fieldState.error]} />
-                )}
-              </Field>
-            )}
-          /> */}
+                </div>
+              ))}
+            </div>
+          </div> */}
+          {/* --- SESSIONS SECTION --- */}
+          <div className='space-y-4'>
+            <div className='flex items-center justify-between'>
+              <h3 className='text-sm font-black uppercase tracking-widest text-zinc-400 flex items-center gap-2'>
+                <BookOpen size={14} /> Curriculum Sessions
+              </h3>
+              <Button
+                type='button'
+                variant='outline'
+                size='sm'
+                onClick={() =>
+                  append({
+                    title: '',
+                    description: '',
+                    maxGrade: 100,
+                    passGrade: 50,
+                  })
+                }
+                className='h-8 rounded-lg text-[10px] font-bold'
+              >
+                <Plus size={14} className='mr-1' /> Add Session
+              </Button>
+            </div>
+
+            <div className='space-y-4'>
+              {fields.map((item, index) => (
+                <div
+                  key={item.id}
+                  className='p-5 rounded-2xl bg-zinc-50 border border-zinc-100 relative group animate-in slide-in-from-top-2 duration-300'
+                >
+                  <div className='flex flex-col gap-4'>
+                    {/* HEADER & TITLE */}
+                    <div className='flex items-start gap-3'>
+                      <span className='flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-zinc-200 text-[10px] font-black'>
+                        {index + 1}
+                      </span>
+                      <div className='flex-1'>
+                        <Controller
+                          name={`sessions.${index}.title`}
+                          control={control}
+                          render={({ field, fieldState }) => (
+                            <div className='space-y-1'>
+                              <label className='text-[10px] font-bold text-zinc-400 uppercase tracking-tight'>
+                                Session Title
+                              </label>
+                              <Input
+                                {...field}
+                                className='bg-white font-bold'
+                                placeholder='e.g. Introduction to Stewardship'
+                              />
+                              {fieldState.error && (
+                                <p className='text-[10px] text-red-500'>
+                                  {fieldState.error.message}
+                                </p>
+                              )}
+                            </div>
+                          )}
+                        />
+                      </div>
+                      {fields.length > 1 && (
+                        <Button
+                          type='button'
+                          variant='ghost'
+                          size='icon'
+                          onClick={() => remove(index)}
+                          className='text-zinc-400 hover:text-red-500 hover:bg-red-50 rounded-xl shrink-0'
+                        >
+                          <Trash2 size={16} />
+                        </Button>
+                      )}
+                    </div>
+
+                    {/* DESCRIPTION */}
+                    <Controller
+                      name={`sessions.${index}.description`}
+                      control={control}
+                      render={({ field }) => (
+                        <div className='space-y-1'>
+                          <label className='text-[10px] font-bold text-zinc-400 uppercase tracking-tight'>
+                            Description
+                          </label>
+                          <Textarea
+                            {...field}
+                            placeholder='Briefly describe the session objectives...'
+                            className='bg-white min-h-20 resize-none'
+                          />
+                        </div>
+                      )}
+                    />
+
+                    {/* GRADING METRICS */}
+                    <div className='grid grid-cols-2 gap-4 pt-2 border-t border-zinc-200/50'>
+                      <Controller
+                        name={`sessions.${index}.maxGrade`}
+                        control={control}
+                        render={({ field }) => (
+                          <div className='space-y-1'>
+                            <label className='text-[10px] font-bold text-zinc-400 uppercase tracking-tight'>
+                              Max Score
+                            </label>
+                            <Input
+                              {...field}
+                              type='number'
+                              className='bg-white'
+                              onChange={(e) =>
+                                field.onChange(parseInt(e.target.value) || 0)
+                              }
+                            />
+                          </div>
+                        )}
+                      />
+                      <Controller
+                        name={`sessions.${index}.passGrade`}
+                        control={control}
+                        render={({ field }) => (
+                          <div className='space-y-1'>
+                            <label className='text-[10px] font-bold text-zinc-400 uppercase tracking-tight'>
+                              Pass Mark
+                            </label>
+                            <Input
+                              {...field}
+                              type='number'
+                              className='bg-white'
+                              onChange={(e) =>
+                                field.onChange(parseInt(e.target.value) || 0)
+                              }
+                            />
+                          </div>
+                        )}
+                      />
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
         </FieldGroup>
       </form>
     </div>

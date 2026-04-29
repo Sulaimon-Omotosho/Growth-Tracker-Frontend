@@ -1,11 +1,20 @@
 'use client'
 
 import { fetcher } from '@/lib/fetcher'
+import {
+  Cell,
+  Community,
+  Course,
+  Department,
+  District,
+  Teams,
+  User,
+} from '@repo/types'
 import { useQuery } from '@tanstack/react-query'
 
 // Departments
 export function useGetTeams() {
-  return useQuery({
+  return useQuery<Teams>({
     queryKey: ['teams'],
     queryFn: () => fetcher('/church/get/teams'),
     staleTime: 1000 * 60 * 5,
@@ -13,7 +22,7 @@ export function useGetTeams() {
 }
 
 export function useGetDepartments(teamId?: string) {
-  return useQuery({
+  return useQuery<Department>({
     queryKey: ['departments', teamId],
     queryFn: () => {
       const url = teamId
@@ -28,7 +37,7 @@ export function useGetDepartments(teamId?: string) {
 
 // Members of Departments
 export function useGetDepartmentMembers(deptId?: string) {
-  return useQuery({
+  return useQuery<User[]>({
     queryKey: ['deptMembers', deptId],
     queryFn: () => {
       if (!deptId) return []
@@ -41,7 +50,7 @@ export function useGetDepartmentMembers(deptId?: string) {
 
 //Districts
 export function useGetDistricts() {
-  return useQuery({
+  return useQuery<District[]>({
     queryKey: ['districts'],
     queryFn: () => fetcher('/church/get/districts'),
   })
@@ -49,7 +58,7 @@ export function useGetDistricts() {
 
 // Communities
 export function useGetCommunities(districtId?: string) {
-  return useQuery({
+  return useQuery<Community[]>({
     queryKey: ['communities', districtId],
     queryFn: () => {
       const url = districtId
@@ -64,7 +73,7 @@ export function useGetCommunities(districtId?: string) {
 
 // Cells
 export function useGetCells(communityId?: string) {
-  return useQuery({
+  return useQuery<Cell[]>({
     queryKey: ['cells', communityId],
     queryFn: () => {
       const url = communityId
@@ -79,7 +88,7 @@ export function useGetCells(communityId?: string) {
 
 // Members of Cell
 export function useGetCellMembers(cellId?: string) {
-  return useQuery({
+  return useQuery<User[]>({
     queryKey: ['cellMembers', cellId],
     queryFn: () => {
       if (!cellId) return []
@@ -87,5 +96,22 @@ export function useGetCellMembers(cellId?: string) {
     },
     staleTime: 1000 * 60 * 5,
     enabled: !!cellId,
+  })
+}
+
+// Courses
+export function useGetCourses() {
+  return useQuery<Course[]>({
+    queryKey: ['courses'],
+    queryFn: () => fetcher('/church/courses/all'),
+    staleTime: 5 * 60 * 1000,
+  })
+}
+
+export function useGetCourseById(id: string) {
+  return useQuery<Course>({
+    queryKey: ['course', id],
+    queryFn: () => fetcher(`/church/courses/${id}`),
+    enabled: !!id,
   })
 }

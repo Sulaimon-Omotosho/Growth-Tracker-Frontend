@@ -1,31 +1,32 @@
 'use client'
 
 import React, { useState } from 'react'
-import { DataTable } from './data-table'
 import { columns } from './columns'
 import { SkeletonTable } from '@/components/Skeleton'
-import { useGetTeams } from '@/hooks/get-church'
-import { useDeleteTeams } from '@/hooks/use-church'
-import { Plus, Search, Users2 } from 'lucide-react'
+import { Plus, Search, BookOpen } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
-import { Teams } from '@repo/types'
+import { Course } from '@repo/types'
+import { DataTable } from './data-table'
+import { useGetCourses } from '@/hooks/get-church'
 
-const WorkForce = () => {
-  const { data, isLoading, isError } = useGetTeams()
-  const deleteTeams = useDeleteTeams()
+const Courses = () => {
+  const { data, isLoading } = useGetCourses()
   const [searchQuery, setSearchQuery] = useState('')
 
   const handleDelete = (ids: string[]) => {
-    if (window.confirm(`Delete ${ids.length} item(s)?`)) {
-      deleteTeams.mutate(ids)
+    if (
+      window.confirm(
+        `Are you sure you want to delete ${ids.length} course(s)? This will remove all associated sessions.`,
+      )
+    ) {
+      // Logic for deleteCourse.mutate(ids) would go here
     }
   }
 
-  // Filter logic
   const filteredData =
-    (data as any)?.filter((team: Teams) =>
-      team.name.toLowerCase().includes(searchQuery.toLowerCase()),
+    data?.filter((course: Course) =>
+      course.title.toLowerCase().includes(searchQuery.toLowerCase()),
     ) ?? []
 
   if (isLoading)
@@ -37,25 +38,23 @@ const WorkForce = () => {
 
   return (
     <div className='p-6 space-y-6'>
-      {/* HEADER SECTION */}
       <div className='flex flex-col md:flex-row md:items-center justify-between gap-4'>
         <div>
           <p className='text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400'>
-            Management
+            Spiritual Growth
           </p>
           <h1 className='text-2xl font-black tracking-tight text-zinc-900 dark:text-zinc-100 flex items-center gap-2'>
-            Workforce Directory{' '}
+            Courses Directory
             <span className='text-xs font-medium text-zinc-400 bg-zinc-100 dark:bg-zinc-900 px-2 py-0.5 rounded-full'>
-              {(data as any)?.length || 0}
+              {data?.length || 0}
             </span>
           </h1>
         </div>
-        <Button className='bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 font-bold hover:opacity-90'>
-          <Plus size={16} className='mr-2' /> Create New Team
+        <Button className='bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 font-bold'>
+          <Plus size={16} className='mr-2' /> Create New Course
         </Button>
       </div>
 
-      {/* SEARCH & FILTERS BAR */}
       <div className='flex items-center gap-4 bg-white dark:bg-zinc-950 p-4 border border-zinc-100 dark:border-zinc-900 rounded-xl'>
         <div className='relative flex-1 max-w-sm'>
           <Search
@@ -63,18 +62,14 @@ const WorkForce = () => {
             size={16}
           />
           <Input
-            placeholder='Search teams...'
+            placeholder='Search courses...'
             className='pl-10 bg-zinc-50 dark:bg-zinc-900 border-none'
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
         </div>
-        <div className='hidden sm:flex gap-2'>
-          {/* Optional: Add status filters here */}
-        </div>
       </div>
 
-      {/* THE TABLE */}
       <div className='bg-white dark:bg-zinc-950 border border-zinc-100 dark:border-zinc-900 rounded-2xl overflow-hidden'>
         <DataTable
           columns={columns}
@@ -86,4 +81,4 @@ const WorkForce = () => {
   )
 }
 
-export default WorkForce
+export default Courses

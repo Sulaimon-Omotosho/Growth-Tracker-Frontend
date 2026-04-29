@@ -1,549 +1,3 @@
-// 'use client'
-
-// import {
-//   Home,
-//   Inbox,
-//   Calendar,
-//   User2,
-//   ChevronUp,
-//   Plus,
-//   Shirt,
-//   User,
-// } from 'lucide-react'
-// import {
-//   Sidebar,
-//   SidebarContent,
-//   SidebarFooter,
-//   SidebarGroup,
-//   SidebarGroupAction,
-//   SidebarGroupContent,
-//   SidebarGroupLabel,
-//   SidebarHeader,
-//   SidebarMenu,
-//   SidebarMenuBadge,
-//   SidebarMenuButton,
-//   SidebarMenuItem,
-//   SidebarSeparator,
-// } from '../ui/sidebar'
-// import Link from 'next/link'
-// import Image from 'next/image'
-// import {
-//   DropdownMenu,
-//   DropdownMenuContent,
-//   DropdownMenuItem,
-//   DropdownMenuTrigger,
-// } from '../ui/dropdown-menu'
-// import AddTeam from '../forms/AddTeam'
-// import AddDepartment from '../forms/AddDepartment'
-// import AddDistrict from '../forms/AddDistrict'
-// import AddCommunity from '../forms/AddCommunity'
-// import AddCell from '../forms/AddCell'
-// import { RightDrawer } from './RightDrawer'
-// import AddZone from '../forms/AddZone'
-// import AddCourse from '../forms/AddCourse'
-// import { useMe } from '@/hooks/use-user'
-// import { redirect } from 'next/navigation'
-// import { useLogout } from '@/hooks/use-auth'
-// import { useState } from 'react'
-// import {
-//   useCreateCell,
-//   useCreateCommunity,
-//   useCreateDepartment,
-//   useCreateDistrict,
-//   useCreateTeam,
-//   useCreateZone,
-// } from '@/hooks/use-church'
-
-// const items = [
-//   {
-//     title: 'Home',
-//     url: '/',
-//     icon: Home,
-//   },
-//   {
-//     title: 'Inbox',
-//     url: '#',
-//     icon: Inbox,
-//   },
-//   {
-//     title: 'Calendar',
-//     url: '#',
-//     icon: Calendar,
-//   },
-//   // {
-//   //   title: 'Search',
-//   //   url: '#',
-//   //   icon: Search,
-//   // },
-//   // {
-//   //   title: 'Settings',
-//   //   url: '#',
-//   //   icon: Settings,
-//   // },
-// ]
-
-// const AppSidebar = () => {
-//   const { data: user, isLoading, error } = useMe()
-//   if (user?.role === 'MEMBER') redirect('/unauthorized')
-//   const logout = useLogout()
-
-//   // Form States
-//   const [isSubmitDisabled, setIsSubmitDisabled] = useState(true)
-//   const [isOpen, setIsOpen] = useState<
-//     'team' | 'dept' | 'dist' | 'comm' | 'zone' | 'cell' | null
-//   >(null)
-//   const createTeam = useCreateTeam()
-//   const createDepartment = useCreateDepartment()
-//   const createDistrict = useCreateDistrict()
-//   const createCommunity = useCreateCommunity()
-//   const createZone = useCreateZone()
-//   const createCell = useCreateCell()
-
-//   return (
-//     <Sidebar collapsible='icon'>
-//       <SidebarHeader className='py-4'>
-//         <SidebarMenu>
-//           <SidebarMenuItem>
-//             <SidebarMenuButton asChild>
-//               <Link href='/'>
-//                 <Image
-//                   src='/assets/logo.jpeg'
-//                   alt='logo'
-//                   width={20}
-//                   height={20}
-//                 />
-//                 <span>The Growth Tracker</span>
-//               </Link>
-//             </SidebarMenuButton>
-//           </SidebarMenuItem>
-//         </SidebarMenu>
-//       </SidebarHeader>
-//       <SidebarSeparator />
-//       <SidebarContent>
-//         <SidebarGroup>
-//           <SidebarGroupLabel>Application</SidebarGroupLabel>
-//           <SidebarGroupContent>
-//             <SidebarMenu>
-//               {items.map((item) => (
-//                 <SidebarMenuItem key={item.title}>
-//                   <SidebarMenuButton asChild>
-//                     <Link href={item.url}>
-//                       <item.icon />
-//                       <span>{item.title}</span>
-//                     </Link>
-//                   </SidebarMenuButton>
-//                   {item.title === 'Inbox' && (
-//                     <SidebarMenuBadge>24</SidebarMenuBadge>
-//                   )}
-//                 </SidebarMenuItem>
-//               ))}
-//             </SidebarMenu>
-//           </SidebarGroupContent>
-//         </SidebarGroup>
-//         {/* TEST Collapseble*/}
-
-//         <SidebarGroup>
-//           <SidebarGroupLabel>Workforce</SidebarGroupLabel>
-//           {/* <SidebarGroupAction>
-//             <Link href='/workforce'>
-//               <Plus /> <span className='sr-only'>Add Team</span>
-//             </Link>
-//           </SidebarGroupAction> */}
-//           <SidebarGroupContent>
-//             <SidebarMenu>
-//               <SidebarMenuItem>
-//                 <SidebarMenuButton asChild>
-//                   <Link href='/workforce'>
-//                     <Shirt />
-//                     See All Teams
-//                   </Link>
-//                 </SidebarMenuButton>
-//               </SidebarMenuItem>
-//               <SidebarMenuItem>
-//                 <RightDrawer
-//                   trigger={
-//                     <SidebarMenuButton>
-//                       <Plus />
-//                       <span>Add Team</span>
-//                     </SidebarMenuButton>
-//                   }
-//                   title='Add Team'
-//                   description='Add new church team.'
-//                   submitLabel='Save Team'
-//                   formId='add-team'
-//                   // onOpenChange={setIsOpen}
-//                   open={isOpen === 'team'}
-//                   onOpenChange={(open) => setIsOpen(open ? 'team' : null)}
-//                   isLoading={createTeam.isPending}
-//                   isSubmitDisabled={isSubmitDisabled}
-//                 >
-//                   <AddTeam
-//                     mutation={createTeam}
-//                     onSuccess={() => setIsOpen(null)}
-//                     onValidationChange={(disabled) =>
-//                       setIsSubmitDisabled(disabled)
-//                     }
-//                   />
-//                 </RightDrawer>
-//               </SidebarMenuItem>
-//               <SidebarMenuItem>
-//                 <RightDrawer
-//                   trigger={
-//                     <SidebarMenuButton>
-//                       <Plus />
-//                       <span>Add Department</span>
-//                     </SidebarMenuButton>
-//                   }
-//                   title='Add Department'
-//                   description='Add new team department.'
-//                   submitLabel='Save Department'
-//                   formId='add-department'
-//                   open={isOpen === 'dept'}
-//                   onOpenChange={(open) => setIsOpen(open ? 'dept' : null)}
-//                   isLoading={createDepartment.isPending}
-//                   isSubmitDisabled={isSubmitDisabled}
-//                 >
-//                   <AddDepartment
-//                     mutation={createDepartment}
-//                     onSuccess={() => setIsOpen(null)}
-//                     onValidationChange={(disabled) =>
-//                       setIsSubmitDisabled(disabled)
-//                     }
-//                   />
-//                 </RightDrawer>
-//               </SidebarMenuItem>
-//             </SidebarMenu>
-//           </SidebarGroupContent>
-//         </SidebarGroup>
-//         <SidebarGroup>
-//           <SidebarGroupLabel>District</SidebarGroupLabel>
-//           {/* <SidebarGroupAction>
-//             <Link href='/workforce'>
-//               <Plus /> <span className='sr-only'>Add Team</span>
-//             </Link>
-//           </SidebarGroupAction> */}
-//           <SidebarGroupContent>
-//             <SidebarMenu>
-//               <SidebarMenuItem>
-//                 <SidebarMenuButton asChild>
-//                   <Link href='/district'>
-//                     <Shirt />
-//                     See All Districts
-//                   </Link>
-//                 </SidebarMenuButton>
-//               </SidebarMenuItem>
-//               <SidebarMenuItem>
-//                 <RightDrawer
-//                   trigger={
-//                     <SidebarMenuButton>
-//                       <Plus />
-//                       <span>Add District</span>
-//                     </SidebarMenuButton>
-//                   }
-//                   title='Add District'
-//                   description='Add new church district.'
-//                   submitLabel='Save District'
-//                   formId='add-district'
-//                   open={isOpen === 'dist'}
-//                   onOpenChange={(open) => setIsOpen(open ? 'dist' : null)}
-//                   isLoading={createDistrict.isPending}
-//                   isSubmitDisabled={isSubmitDisabled}
-//                 >
-//                   <AddDistrict
-//                     mutation={createDistrict}
-//                     onSuccess={() => setIsOpen(null)}
-//                     onValidationChange={(disabled) =>
-//                       setIsSubmitDisabled(disabled)
-//                     }
-//                   />
-//                 </RightDrawer>
-//               </SidebarMenuItem>
-//               <SidebarMenuItem>
-//                 <RightDrawer
-//                   trigger={
-//                     <SidebarMenuButton>
-//                       <Plus />
-//                       <span>Add Community</span>
-//                     </SidebarMenuButton>
-//                   }
-//                   title='Add Community'
-//                   description='Add new district community.'
-//                   submitLabel='Save Community'
-//                   formId='add-community'
-//                   open={isOpen === 'comm'}
-//                   onOpenChange={(open) => setIsOpen(open ? 'comm' : null)}
-//                   isLoading={createCommunity.isPending}
-//                   isSubmitDisabled={isSubmitDisabled}
-//                 >
-//                   <AddCommunity
-//                     mutation={createCommunity}
-//                     onSuccess={() => setIsOpen(null)}
-//                     onValidationChange={(disabled) =>
-//                       setIsSubmitDisabled(disabled)
-//                     }
-//                   />
-//                 </RightDrawer>
-//               </SidebarMenuItem>
-//               <SidebarMenuItem>
-//                 <RightDrawer
-//                   trigger={
-//                     <SidebarMenuButton>
-//                       <Plus />
-//                       <span>Add Zone</span>
-//                     </SidebarMenuButton>
-//                   }
-//                   title='Add Zone'
-//                   description='Add new zone.'
-//                   submitLabel='Save Zone'
-//                   formId='add-zone'
-//                   open={isOpen === 'zone'}
-//                   onOpenChange={(open) => setIsOpen(open ? 'zone' : null)}
-//                   isLoading={createZone.isPending}
-//                   isSubmitDisabled={isSubmitDisabled}
-//                 >
-//                   <AddZone
-//                     mutation={createZone}
-//                     onSuccess={() => setIsOpen(null)}
-//                     onValidationChange={(disabled) =>
-//                       setIsSubmitDisabled(disabled)
-//                     }
-//                   />
-//                 </RightDrawer>
-//               </SidebarMenuItem>
-//               <SidebarMenuItem>
-//                 <RightDrawer
-//                   trigger={
-//                     <SidebarMenuButton>
-//                       <Plus />
-//                       <span>Add Cell</span>
-//                     </SidebarMenuButton>
-//                   }
-//                   title='Add Cell'
-//                   description='Add new cell.'
-//                   submitLabel='Save Cell'
-//                   formId='add-cell'
-//                   open={isOpen === 'cell'}
-//                   onOpenChange={(open) => setIsOpen(open ? 'cell' : null)}
-//                   isLoading={createCell.isPending}
-//                   isSubmitDisabled={isSubmitDisabled}
-//                 >
-//                   <AddCell
-//                     mutation={createCell}
-//                     onSuccess={() => setIsOpen(null)}
-//                     onValidationChange={(disabled) =>
-//                       setIsSubmitDisabled(disabled)
-//                     }
-//                   />
-//                 </RightDrawer>
-//               </SidebarMenuItem>
-//             </SidebarMenu>
-//           </SidebarGroupContent>
-//         </SidebarGroup>
-//         <SidebarGroup>
-//           <SidebarGroupLabel>Members</SidebarGroupLabel>
-//           {/* <SidebarGroupAction>
-//             <Plus /> <span className='sr-only'>Add Product</span>
-//           </SidebarGroupAction> */}
-//           <SidebarGroupContent>
-//             <SidebarMenu>
-//               <SidebarMenuItem>
-//                 <SidebarMenuButton asChild>
-//                   <Link href='/users/pastors'>
-//                     <User />
-//                     Pastors
-//                   </Link>
-//                 </SidebarMenuButton>
-//               </SidebarMenuItem>
-//               <SidebarMenuItem>
-//                 <SidebarMenuButton asChild>
-//                   <Link href='/users/leaders'>
-//                     <User />
-//                     Leaders
-//                   </Link>
-//                 </SidebarMenuButton>
-//               </SidebarMenuItem>
-//               <SidebarMenuItem>
-//                 <SidebarMenuButton asChild>
-//                   <Link href='/users/workers'>
-//                     <User />
-//                     Workers
-//                   </Link>
-//                 </SidebarMenuButton>
-//               </SidebarMenuItem>
-//               <SidebarMenuItem>
-//                 <SidebarMenuButton asChild>
-//                   <Link href='/users/members'>
-//                     <User />
-//                     Members
-//                   </Link>
-//                 </SidebarMenuButton>
-//               </SidebarMenuItem>
-//               {/* <SidebarMenuItem>
-//                 <SidebarMenuButton asChild>
-//                   <Sheet>
-//                     <SheetTrigger asChild>
-//                       <SidebarMenuButton asChild>
-//                         <Link href='#'>
-//                           <Plus />
-//                           Add User
-//                         </Link>
-//                       </SidebarMenuButton>
-//                     </SheetTrigger>
-//                     <AddUser />
-//                   </Sheet>
-//                 </SidebarMenuButton>
-//               </SidebarMenuItem> */}
-//             </SidebarMenu>
-//           </SidebarGroupContent>
-//         </SidebarGroup>
-//         <SidebarGroup>
-//           <SidebarGroupLabel>Courses</SidebarGroupLabel>
-//           {/* <SidebarGroupAction>
-//             <Plus /> <span className='sr-only'>Add Course</span>
-//           </SidebarGroupAction> */}
-//           <SidebarGroupContent>
-//             <SidebarMenu>
-//               <SidebarMenuItem>
-//                 <SidebarMenuButton asChild>
-//                   <Link href='/payments'>
-//                     <User />
-//                     See All Courses
-//                   </Link>
-//                 </SidebarMenuButton>
-//               </SidebarMenuItem>
-//               <SidebarMenuItem>
-//                 <RightDrawer
-//                   trigger={
-//                     <SidebarMenuButton>
-//                       <Plus />
-//                       <span>Add Course</span>
-//                     </SidebarMenuButton>
-//                   }
-//                   title='Add Course'
-//                   description='Add new church course.'
-//                   submitLabel='Save Course'
-//                   formId='add-course'
-//                 >
-//                   <AddCourse />
-//                 </RightDrawer>
-//                 {/* <SidebarMenuButton asChild>
-//                   <Sheet>
-//                     <SheetTrigger asChild>
-//                       <SidebarMenuButton asChild>
-//                         <Link href='#'>
-//                           <Plus />
-//                           Add Course
-//                         </Link>
-//                       </SidebarMenuButton>
-//                     </SheetTrigger>
-//                     <AddOrder />
-//                   </Sheet>
-//                 </SidebarMenuButton> */}
-//               </SidebarMenuItem>
-//             </SidebarMenu>
-//           </SidebarGroupContent>
-//         </SidebarGroup>
-//         {/* COLLAPSABLE */}
-//         {/* <Collapsible defaultOpen className='group/collapsible'>
-//           <SidebarGroup>
-//             <SidebarGroupLabel asChild>
-//               <CollapsibleTrigger>
-//                 Collapsable Group
-//                 <ChevronDown className='ml-auto transition-transform group-data-[state=open]/collapsible:rotate-180' />
-//               </CollapsibleTrigger>
-//             </SidebarGroupLabel>
-//             <CollapsibleContent>
-//               <SidebarGroupContent>
-//                 <SidebarMenu>
-//                   <SidebarMenuItem>
-//                     <SidebarMenuButton asChild>
-//                       <Link href='/#'>
-//                         <Projector />
-//                         See All Projects
-//                       </Link>
-//                     </SidebarMenuButton>
-//                   </SidebarMenuItem>
-//                   <SidebarMenuItem>
-//                     <SidebarMenuButton asChild>
-//                       <Link href='/#'>
-//                         <Plus />
-//                         Add Project
-//                       </Link>
-//                     </SidebarMenuButton>
-//                   </SidebarMenuItem>
-//                 </SidebarMenu>
-//               </SidebarGroupContent>
-//             </CollapsibleContent>
-//           </SidebarGroup>
-//         </Collapsible> */}
-//         {/* NESTED */}
-//         {/* <SidebarGroup>
-//           <SidebarGroupLabel>Nested Items</SidebarGroupLabel>
-//           <SidebarGroupContent>
-//             <SidebarMenu>
-//               <SidebarMenuItem>
-//                 <SidebarMenuButton asChild>
-//                   <Link href='/#'>
-//                     <Projector />
-//                     See All Projects
-//                   </Link>
-//                 </SidebarMenuButton>
-//                 <SidebarMenuSub>
-//                   <SidebarMenuSubItem>
-//                     <SidebarMenuSubButton asChild>
-//                       <Link href='/#'>
-//                         <Plus />
-//                         Add Project
-//                       </Link>
-//                     </SidebarMenuSubButton>
-//                   </SidebarMenuSubItem>
-//                   <SidebarMenuSubItem>
-//                     <SidebarMenuSubButton asChild>
-//                       <Link href='/#'>
-//                         <Plus />
-//                         Add Category
-//                       </Link>
-//                     </SidebarMenuSubButton>
-//                   </SidebarMenuSubItem>
-//                 </SidebarMenuSub>
-//               </SidebarMenuItem>
-//             </SidebarMenu>
-//           </SidebarGroupContent>
-//         </SidebarGroup> */}
-//       </SidebarContent>
-//       <SidebarFooter>
-//         <SidebarMenu>
-//           <SidebarMenuItem>
-//             <DropdownMenu>
-//               <DropdownMenuTrigger asChild>
-//                 {isLoading ? (
-//                   <p className='animate-pulse'>Loading...</p>
-//                 ) : error || !user ? (
-//                   <p>User not found</p>
-//                 ) : (
-//                   <SidebarMenuButton>
-//                     <User2 /> {user.firstName} {user.lastName}{' '}
-//                     <ChevronUp className='ml-auto' />
-//                   </SidebarMenuButton>
-//                 )}
-//               </DropdownMenuTrigger>
-//               <DropdownMenuContent align='end'>
-//                 <DropdownMenuItem>Account</DropdownMenuItem>
-//                 <DropdownMenuItem>Setting</DropdownMenuItem>
-//                 <DropdownMenuItem onClick={() => logout.mutate()}>
-//                   Sign out
-//                 </DropdownMenuItem>
-//               </DropdownMenuContent>
-//             </DropdownMenu>
-//           </SidebarMenuItem>
-//         </SidebarMenu>
-//       </SidebarFooter>
-//     </Sidebar>
-//   )
-// }
-
-// export default AppSidebar
-
 'use client'
 
 import React, { useState } from 'react'
@@ -597,6 +51,7 @@ import { RightDrawer } from './RightDrawer'
 import {
   useCreateCell,
   useCreateCommunity,
+  useCreateCourse,
   useCreateDepartment,
   useCreateDistrict,
   useCreateSmallGroup,
@@ -650,6 +105,7 @@ const AppSidebar = () => {
     zone: useCreateZone(),
     cell: useCreateCell(),
     inba: useCreateSmallGroup(),
+    course: useCreateCourse(),
   }
 
   if (user?.role === 'MEMBER') redirect('/unauthorized')
@@ -724,6 +180,94 @@ const AppSidebar = () => {
               {mainItems.map((item) => (
                 <NavItem key={item.title} item={item} />
               ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
+        {/* SECTION: HICC COURSES */}
+        <SidebarGroup>
+          <SidebarGroupLabel className='text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 py-4'>
+            Spiritual Growth
+          </SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild>
+                  <Link href='/courses' className='flex items-center gap-3'>
+                    <Shirt size={18} className='text-zinc-500' />
+                    <span className='text-sm font-medium'>All Courses</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+
+              <Collapsible asChild className='group/collapsible'>
+                <SidebarMenuItem>
+                  {/* <CollapsibleTrigger asChild>
+                    <SidebarMenuButton tooltip='Create'>
+                      <Settings2 size={18} className='text-zinc-500' />
+                      <span>Create</span>
+                      <ChevronRight className='ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90' />
+                    </SidebarMenuButton>
+                  </CollapsibleTrigger> */}
+
+                  {/* <CollapsibleContent> */}
+                  <SidebarMenuSub>
+                    <SidebarMenuSubItem>
+                      <RightDrawer
+                        trigger={
+                          <SidebarMenuButton className='text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100'>
+                            <Plus size={18} />
+                            <span className='text-sm'>Create A Course</span>
+                          </SidebarMenuButton>
+                        }
+                        title='Create A Course'
+                        description='Register a new course.'
+                        submitLabel='Save Course'
+                        formId='add-course'
+                        open={isOpen === 'course'}
+                        onOpenChange={(open) =>
+                          setIsOpen(open ? 'course' : null)
+                        }
+                        isLoading={mutations.course.isPending}
+                        isSubmitDisabled={isSubmitDisabled}
+                      >
+                        <AddCourse
+                          mutation={mutations.course}
+                          onSuccess={() => setIsOpen(null)}
+                          onValidationChange={setIsSubmitDisabled}
+                        />
+                      </RightDrawer>
+                    </SidebarMenuSubItem>
+                    {/* <SidebarMenuSubItem>
+                        <RightDrawer
+                          trigger={
+                            <SidebarMenuButton className='text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100'>
+                              <Plus size={18} />
+                              <span className='text-sm'>Create Department</span>
+                            </SidebarMenuButton>
+                          }
+                          title='Create Department'
+                          description='Register a new church team department.'
+                          submitLabel='Save Department'
+                          formId='add-department'
+                          open={isOpen === 'dept'}
+                          onOpenChange={(open) =>
+                            setIsOpen(open ? 'dept' : null)
+                          }
+                          isLoading={mutations.dept.isPending}
+                          isSubmitDisabled={isSubmitDisabled}
+                        >
+                          <AddDepartment
+                            mutation={mutations.dept}
+                            onSuccess={() => setIsOpen(null)}
+                            onValidationChange={setIsSubmitDisabled}
+                          />
+                        </RightDrawer>
+                      </SidebarMenuSubItem> */}
+                  </SidebarMenuSub>
+                  {/* </CollapsibleContent> */}
+                </SidebarMenuItem>
+              </Collapsible>
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>

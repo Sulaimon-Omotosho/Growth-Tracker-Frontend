@@ -140,3 +140,31 @@ export const useJoinSmallGroup = () => {
     },
   })
 }
+
+// Start A Course
+export function useEnrollInCourse() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: async (courseId: string) => {
+      const response = await fetcher(`/course/${courseId}/enroll`, {
+        method: 'POST',
+      })
+      return response
+    },
+    onSuccess: (_, courseId) => {
+      queryClient.invalidateQueries({ queryKey: ['courses', 'available'] })
+      queryClient.invalidateQueries({ queryKey: ['courses', 'my-enrollments'] })
+      queryClient.invalidateQueries({ queryKey: ['course', courseId] })
+
+      toast.success(
+        "Successfully enrolled! Head over to 'My Courses' to start.",
+      )
+    },
+    onError: (error: any) => {
+      const errorMessage =
+        error?.message || 'Failed to enroll. Please try again.'
+      toast.error(errorMessage)
+    },
+  })
+}

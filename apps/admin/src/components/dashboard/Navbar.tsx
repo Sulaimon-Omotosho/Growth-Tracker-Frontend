@@ -6,8 +6,16 @@ import Profile from './Profile'
 import Notification from './Notification'
 import { LayoutDashboard } from 'lucide-react'
 import Link from 'next/link'
+import { useMe } from '@/hooks/use-user'
+import { redirect } from 'next/navigation'
 
 const Navbar = () => {
+  const { data: user, isLoading } = useMe()
+
+  if (!user) {
+    redirect('/')
+  }
+
   return (
     <nav className='sticky top-0 z-30 w-full border-b border-zinc-100 dark:border-zinc-900 bg-white/80 dark:bg-zinc-950/80 backdrop-blur-md px-4 h-16 flex items-center justify-between'>
       {/* LEFT: System Controls */}

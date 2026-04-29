@@ -118,7 +118,7 @@ export default function InterestGroupHub() {
         <div className='lg:col-span-3 space-y-6'>
           <div className='flex items-center justify-between'>
             <h2 className='text-2xl font-black tracking-tighter flex items-center gap-2'>
-              <Compass className='text-blue-600' /> What's Happening in{' '}
+              <Compass className='text-blue-600' />
               {myGroups[0]?.name}
             </h2>
             <div className='flex gap-2'>

@@ -4,11 +4,34 @@ import { SidebarTrigger } from '../ui/sidebar'
 import Profile from '../Profile'
 import Theme from '../Theme'
 import Notification from './Notification'
-import { useUser } from '@/utils/userContext'
 import { Separator } from '../ui/separator'
+// import { redirect } from 'next/navigation'
+import { useMe } from '@/hooks/get-user'
+import { useRouter } from 'next/navigation'
+import { useEffect } from 'react'
 
 const Navbar = () => {
-  const { user } = useUser()
+  const { data: user, isLoading } = useMe()
+  const router = useRouter()
+
+  useEffect(() => {
+    if (!isLoading && !user) {
+      router.push('/sign-in')
+    }
+  }, [user, isLoading, router])
+
+  if (isLoading) {
+    return (
+      <nav className='sticky top-0 z-30 w-full border-b bg-background/80 backdrop-blur-md px-4 py-3'>
+        <div className='flex justify-between items-center animate-pulse'>
+          <div className='h-8 w-32 bg-gray-200 rounded-lg' />
+          <div className='h-8 w-8 bg-gray-200 rounded-full' />
+        </div>
+      </nav>
+    )
+  }
+
+  if (!user) return null
 
   return (
     <nav className='sticky top-0 z-30 w-full border-b border-gray-100 dark:border-gray-800 bg-background/80 backdrop-blur-md px-4 py-3'>

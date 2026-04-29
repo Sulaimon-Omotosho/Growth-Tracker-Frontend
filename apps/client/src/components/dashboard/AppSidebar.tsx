@@ -134,10 +134,10 @@ export function AppSidebar() {
           </SidebarGroupLabel>
           {/* <SidebarGroupContent> */}
           <SidebarMenu>
-            <SidebarMenuItem>
+            {/* <SidebarMenuItem>
               <SidebarMenuButton asChild tooltip='Growth Track'>
                 <Link href='/growth_track'>
-                  <ChartLine />
+                  <ChartLine /> <Waves />
                   <span>Growth Track</span>
                 </Link>
               </SidebarMenuButton>
@@ -149,18 +149,19 @@ export function AppSidebar() {
                   Foundation Class
                 </Link>
               </SidebarMenuButton>
-            </SidebarMenuItem>
+            </SidebarMenuItem> */}
             <SidebarMenuItem>
               <SidebarMenuButton asChild tooltip='Baptism'>
-                <Link href='/baptism'>
-                  <Waves /> Baptism
+                <Link href='/dashboard/courses/enrolled'>
+                  <ChartLine /> Enrolled Courses
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
             <SidebarMenuItem>
               <SidebarMenuButton asChild tooltip='Courses'>
-                <Link href='/allCourses'>
-                  <LibraryBig /> Courses
+                <Link href='/dashboard/courses'>
+                  <LibraryBig />
+                  All Courses
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>

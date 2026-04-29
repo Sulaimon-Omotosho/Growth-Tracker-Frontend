@@ -7,7 +7,6 @@ import NextStepCard from '@/components/dashboard/NextStepCard'
 import Events from '@/components/dashboard/Events'
 import { AttendanceChart } from '@/components/dashboard/AttendanceChart'
 import { useUser } from '@/utils/userContext'
-import { redirect } from 'next/navigation'
 import { AnnouncementCard } from '@/components/dashboard/AnnouncementCard'
 import { MessageCard } from '@/components/dashboard/MessageCard'
 import { MOCK_MESSAGES } from '@/lib/mock'
@@ -21,8 +20,6 @@ const UserDashboard = () => {
     useAnnouncements()
 
   const messages = MOCK_MESSAGES
-
-  if (!user) redirect('/')
 
   // Loading UI
   if (isLoading) {

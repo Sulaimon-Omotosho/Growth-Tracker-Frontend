@@ -1,16 +1,17 @@
+'use client'
+
 import { ModeToggle } from '@/components/ThemeToggle'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { AuthForm } from '@/components/forms/AuthForm'
 import LoginGoogle from '@/components/LoginGoogle'
-import { cookies } from 'next/headers'
 import { Lock } from 'lucide-react'
+import { useMe } from '@/hooks/use-user'
 
-const LoginPage = async () => {
-  const cookieStore = await cookies()
-  const accessToken = cookieStore.get('accessToken')?.value
+const LoginPage = () => {
+  const { data } = useMe()
 
-  if (accessToken) {
+  if (data) {
     redirect('/admin')
   }
 

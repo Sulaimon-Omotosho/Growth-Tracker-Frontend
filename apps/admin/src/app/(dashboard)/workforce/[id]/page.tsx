@@ -18,7 +18,7 @@ const Departments = () => {
   const [searchQuery, setSearchQuery] = useState('')
 
   const filteredData =
-    data?.filter((dept: Department) =>
+    (data as any)?.filter((dept: Department) =>
       dept.name.toLowerCase().includes(searchQuery.toLowerCase()),
     ) ?? []
 
@@ -48,7 +48,7 @@ const Departments = () => {
           <h1 className='text-2xl font-black tracking-tight text-zinc-900 dark:text-zinc-100 flex items-center gap-2'>
             Departmental Units
             <span className='text-xs font-medium text-zinc-400 bg-zinc-100 dark:bg-zinc-900 px-2 py-0.5 rounded-full'>
-              {data?.length || 0}
+              {(data as any)?.length || 0}
             </span>
           </h1>
         </div>

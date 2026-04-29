@@ -294,6 +294,32 @@ export function useCreateTeam() {
   })
 }
 
+// Course
+export function useCreateCourse() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (payload: any) =>
+      fetcher(`/course/add`, {
+        method: 'POST',
+        body: JSON.stringify(payload),
+      }),
+
+    onSuccess: (newCourse) => {
+      queryClient.invalidateQueries({ queryKey: ['courses'] })
+      queryClient.invalidateQueries({ queryKey: ['admin-stats'] })
+      toast.success(
+        `${newCourse.title} has been created with ${newCourse.sessions?.length || 0} sessions!`,
+      )
+    },
+
+    onError: (error: any) => {
+      const message = error?.message || 'Failed to create course'
+      toast.error(message)
+    },
+  })
+}
+
 // Delete
 export function useDeleteTeams() {
   const queryClient = useQueryClient()
