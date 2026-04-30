@@ -11,9 +11,11 @@ import { AnnouncementCard } from '@/components/dashboard/AnnouncementCard'
 import { MessageCard } from '@/components/dashboard/MessageCard'
 import { MOCK_MESSAGES } from '@/lib/mock'
 import { useAnnouncements } from '@/hooks/get-events'
+import { useMyEnrollments } from '@/hooks/get-church'
 
 const UserDashboard = () => {
   const { user, isLoading } = useUser()
+  const { data: courses, isLoading: coursesLoading } = useMyEnrollments()
   // console.log('Dashboard:', user)
 
   const { data: announcements, isLoading: announcementsLoading } =
@@ -53,7 +55,8 @@ const UserDashboard = () => {
                   href={`/dashboard/${user.id}`}
                   className='text-blue-600 hover:underline inline-flex items-center gap-1'
                 >
-                  {user?.firstName} <ArrowUpRight className='w-5 h-5' />
+                  {user?.firstName} {user?.lastName}
+                  <ArrowUpRight className='w-5 h-5' />
                 </Link>
               </h1>
               <p className='text-muted-foreground text-sm md:text-base'>
@@ -62,7 +65,7 @@ const UserDashboard = () => {
             </div>
 
             {/* PROGRESS WIDGET */}
-            <div className='bg-white dark:bg-gray-900 p-4 rounded-xl shadow-sm border border-gray-100 dark:border-gray-800 w-full md:w-72'>
+            {/* <div className='bg-white dark:bg-gray-900 p-4 rounded-xl shadow-sm border border-gray-100 dark:border-gray-800 w-full md:w-72'>
               <div className='flex justify-between items-center mb-2'>
                 <span className='text-[10px] uppercase font-bold text-gray-500 tracking-wider'>
                   Growth Track
@@ -73,14 +76,20 @@ const UserDashboard = () => {
               <p className='text-[10px] text-gray-400 mt-2 italic'>
                 1 class remaining to completion
               </p>
-            </div>
+            </div> */}
           </header>
 
           {/* MAIN GRID LAYOUT */}
           <main className='grid grid-cols-1 lg:grid-cols-3 gap-8'>
             {/* Left  */}
             <div className='lg:col-span-2 space-y-8'>
-              <NextStepCard user={user} />
+              {user && (
+                <NextStepCard
+                  user={user}
+                  courses={courses}
+                  isLoading={coursesLoading}
+                />
+              )}
 
               <section className='space-y-4'>
                 <h2 className='text-lg font-bold flex items-center gap-2'>

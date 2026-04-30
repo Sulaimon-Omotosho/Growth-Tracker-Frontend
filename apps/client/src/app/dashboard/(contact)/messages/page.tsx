@@ -7,7 +7,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import {
   Search,
-  Plus,
+  // Plus,
   MoreVertical,
   Send,
   Paperclip,
@@ -22,11 +22,13 @@ import {
   MessageSquare,
   User,
   Heart,
+  Menu,
 } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 
 export default function MessagesPage() {
   const [activeCategory, setActiveCategory] = useState('all')
+  const [isCollapsed, setIsCollapsed] = useState(false)
 
   const contacts = [
     {
@@ -69,95 +71,87 @@ export default function MessagesPage() {
 
   return (
     <div className='flex h-[calc(100vh-120px)] overflow-hidden rounded-3xl border bg-white shadow-sm mt-6'>
-      {/* --- 1. CATEGORY RAIL (SLIM) --- */}
+      {/* --- CATEGORY RAIL (SLIM) --- */}
       <div className='w-16 flex flex-col items-center py-6 border-r gap-6 bg-zinc-50/50'>
         <Button
           variant='ghost'
           size='icon'
-          className='rounded-2xl bg-zinc-900 text-white hover:bg-zinc-800 h-10 w-10'
+          onClick={() => setIsCollapsed(!isCollapsed)}
+          className={`rounded-2xl transition-all duration-200 lg:pointer-events-none lg:bg-transparent lg:text-zinc-900 ${
+            isCollapsed
+              ? 'bg-blue-600 text-white'
+              : 'text-zinc-400 hover:bg-zinc-200'
+          }`}
         >
-          <Plus size={20} />
+          <MessageSquare size={18} />
         </Button>
         <div className='flex flex-col gap-4'>
-          {['all', 'dm', 'dept', 'cell', 'interest'].map((cat) => (
+          {['dm', 'fav', 'group'].map((cat) => (
             <button
               key={cat}
               onClick={() => setActiveCategory(cat)}
               className={`h-10 w-10 rounded-2xl flex items-center justify-center transition-all ${activeCategory === cat ? 'bg-blue-600 text-white shadow-lg' : 'text-zinc-400 hover:bg-zinc-200'}`}
             >
-              {cat === 'all' && <MessageSquare size={18} />}
+              {/* {cat === 'all' && <MessageSquare size={18} />} */}
               {cat === 'dm' && <User size={18} />}
-              {cat === 'dept' && <ShieldCheck size={18} />}
-              {cat === 'cell' && <Heart size={18} />}
-              {cat === 'interest' && <Users size={18} />}
+              {/* {cat === 'dept' && <ShieldCheck size={18} />} */}
+              {cat === 'fav' && <Heart size={18} />}
+              {cat === 'group' && <Users size={18} />}
             </button>
           ))}
         </div>
       </div>
 
-      {/* --- 2. CONVERSATION LIST --- */}
-      <div className='w-80 border-r flex flex-col bg-white'>
-        <div className='p-6 space-y-4'>
-          <h2 className='text-xl font-black tracking-tighter'>Messages</h2>
-          <div className='relative'>
-            <Search
-              className='absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400'
-              size={16}
-            />
-            <Input
-              placeholder='Search chats...'
-              className='pl-10 bg-zinc-100 border-none rounded-xl h-10 text-xs font-medium'
-            />
+      {/* --- CONVERSATION LIST --- */}
+      <div
+        className={`border-r flex flex-col bg-white transition-all duration-300 ease-in-out overflow-hidden ${
+          isCollapsed ? 'w-0' : 'w-80'
+        } lg:w-80 lg:opacity-100`}
+      >
+        <div className='w-80 flex flex-col h-full'>
+          <div className='p-6 space-y-4'>
+            <h2 className='text-xl font-black tracking-tighter'>Messages</h2>
+            <div className='relative'>
+              <Search
+                className='absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400'
+                size={16}
+              />
+              <Input
+                placeholder='Search chats...'
+                className='pl-10 bg-zinc-100 border-none rounded-xl h-10 text-xs font-medium'
+              />
+            </div>
           </div>
-        </div>
 
-        <div className='flex-1 overflow-y-auto'>
-          {contacts.map((contact) => (
-            <div
-              key={contact.id}
-              className={`p-4 mx-2 rounded-2xl flex gap-3 cursor-pointer transition-colors group mb-1 ${contact.id === 1 ? 'bg-blue-50' : 'hover:bg-zinc-50'}`}
-            >
-              <div className='relative'>
+          <div className='flex-1 overflow-y-auto'>
+            {contacts.map((contact) => (
+              <div
+                key={contact.id}
+                className='p-4 mx-2 rounded-2xl flex gap-3 cursor-pointer hover:bg-zinc-50 mb-1'
+              >
                 <Avatar className='h-12 w-12'>
                   <AvatarFallback className='font-bold bg-zinc-100'>
                     {contact.name[0]}
                   </AvatarFallback>
                 </Avatar>
-                {contact.online && (
-                  <div className='absolute bottom-0 right-0 h-3 w-3 bg-green-500 border-2 border-white rounded-full' />
-                )}
-              </div>
-              <div className='flex-1 min-w-0'>
-                <div className='flex justify-between items-start mb-1'>
-                  <p
-                    className={`text-sm font-black truncate ${contact.id === 1 ? 'text-blue-900' : 'text-zinc-900'}`}
-                  >
+                <div className='flex-1 min-w-0'>
+                  <p className='text-sm font-black truncate text-zinc-900'>
                     {contact.name}
                   </p>
-                  <span className='text-[10px] text-zinc-400 font-bold'>
-                    {contact.time}
-                  </span>
-                </div>
-                <div className='flex justify-between items-center'>
                   <p className='text-xs text-zinc-500 truncate font-medium'>
                     {contact.lastMsg}
                   </p>
-                  {contact.unread > 0 && (
-                    <Badge className='bg-blue-600 text-white border-none h-5 min-w-5 flex items-center justify-center text-[10px] font-black'>
-                      {contact.unread}
-                    </Badge>
-                  )}
                 </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </div>
 
-      {/* --- 3. CHAT INTERFACE --- */}
-      <div className='flex-1 flex flex-col bg-white relative'>
+      {/* --- CHAT INTERFACE --- */}
+      <div className='flex-1 flex flex-col bg-white relative min-w-0'>
         {/* Chat Header */}
-        <div className='h-20 border-b flex items-center justify-between px-6 bg-white/80 backdrop-blur-md z-10'>
+        <div className='h-20 border-b flex items-center justify-between px-6'>
           <div className='flex items-center gap-3'>
             <Avatar className='h-10 w-10'>
               <AvatarFallback className='font-bold bg-blue-100 text-blue-700'>
@@ -169,18 +163,12 @@ export default function MessagesPage() {
               <div className='flex items-center gap-1'>
                 <Circle size={8} className='fill-green-500 text-green-500' />
                 <span className='text-[10px] font-bold text-zinc-400 uppercase tracking-tighter'>
-                  Active in Media Dept
+                  Active
                 </span>
               </div>
             </div>
           </div>
           <div className='flex items-center gap-2'>
-            {/* <Button variant='ghost' size='icon' className='rounded-full'>
-              <Phone size={18} className='text-zinc-500' />
-            </Button>
-            <Button variant='ghost' size='icon' className='rounded-full'>
-              <Video size={18} className='text-zinc-500' />
-            </Button> */}
             <Button variant='ghost' size='icon' className='rounded-full'>
               <Info size={18} className='text-zinc-500' />
             </Button>

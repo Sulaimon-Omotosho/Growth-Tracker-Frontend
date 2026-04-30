@@ -12,7 +12,6 @@ import { CourseStatus } from '@repo/types'
 const Enrolled = () => {
   const { data, isLoading } = useMyEnrollments()
   const enrollments = data as any[]
-  console.log('Enrollments:', enrollments)
 
   if (isLoading)
     return (

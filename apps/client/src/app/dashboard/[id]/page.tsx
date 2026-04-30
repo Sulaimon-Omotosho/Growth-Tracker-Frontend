@@ -5,8 +5,10 @@ import DepartmentsNSmallGroups from '@/components/dashboard/DepartmentsNSmallGro
 import { NextStepChart } from '@/components/dashboard/NextStepChart'
 import { RightDrawer } from '@/components/dashboard/RightDrawer'
 import UserForm from '@/components/forms/UserForm'
+import { useMyEnrollments } from '@/hooks/get-church'
 import { useUpdateAddress, useUpdateProfile } from '@/hooks/use-auth'
 import { useUser } from '@/utils/userContext'
+import { Course } from '@repo/types'
 import {
   ArrowRight,
   ChevronRight,
@@ -44,6 +46,7 @@ const ProfilePage = () => {
   const [isOpen, setIsOpen] = useState<'edit' | null>(null)
   const updateProfile = useUpdateProfile()
   const updateAddress = useUpdateAddress()
+  const { data: courses, isLoading: coursesLoading } = useMyEnrollments()
 
   return (
     <section className='flex flex-col lg:flex-row min-h-screen'>
@@ -161,7 +164,7 @@ const ProfilePage = () => {
       <section className='w-full lg:w-1/3 p-4 lg:p-6'>
         <div className='sticky top-6 flex flex-col gap-4'>
           <div className='p-6 rounded-xl bg-gray-200 dark:bg-gray-900 border border-transparent hover:border-gray-300 dark:hover:border-gray-700 transition-colors'>
-            <NextStepChart />
+            <NextStepChart data={courses as Course[]} />
             <section className='mt-8'>
               <div className='flex justify-between items-center mb-4'>
                 <h2 className='font-bold text-lg'>Messages</h2>

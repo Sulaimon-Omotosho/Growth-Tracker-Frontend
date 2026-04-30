@@ -336,8 +336,8 @@ export function AppSidebar() {
                 side='top'
                 className='w-56 rounded-xl'
               >
-                <DropdownMenuItem className='gap-2'>
-                  <Link href={`/dashboard/${user?.id}`}>
+                <DropdownMenuItem>
+                  <Link href={`/dashboard/${user?.id}`} className='flex gap-2'>
                     <User className='w-4 h-4' /> Profile
                   </Link>
                 </DropdownMenuItem>
