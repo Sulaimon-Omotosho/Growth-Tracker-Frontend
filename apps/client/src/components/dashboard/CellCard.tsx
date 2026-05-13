@@ -4,7 +4,7 @@ import Image from 'next/image'
 import React, { useRef } from 'react'
 import { Input } from '../ui/input'
 import { Textarea } from '../ui/textarea'
-import { User } from '@repo/types'
+import { OnboardingParticipant, User } from '@repo/types'
 import { getNextMeetingDate } from '@/lib/utils'
 
 const CellCard = ({ user }: any) => {
@@ -18,7 +18,18 @@ const CellCard = ({ user }: any) => {
     el.style.height = el.scrollHeight + 'px'
   }
 
-  if (!user?.cell) {
+  const onboardingCellName = user?.onboardingParticipations?.find(
+    (p: OnboardingParticipant) => p.onboardingRoom.cell !== null,
+  )?.onboardingRoom.cell?.name
+
+  const onboardingCellLeader = user?.onboardingParticipations?.find(
+    (p: OnboardingParticipant) => p.onboardingRoom.cell !== null,
+  )?.onboardingRoom.cell?.name
+
+  const displayCellName =
+    user?.cell?.name || onboardingCellName || 'Join a Cell'
+
+  if (!user?.cell && !onboardingCellName) {
     return (
       <div className='px-4 py-8 mt-4 border border-dashed rounded-md text-center text-muted-foreground'>
         <p className='text-sm'>You haven't joined a cell yet.</p>
@@ -26,15 +37,26 @@ const CellCard = ({ user }: any) => {
     )
   }
 
-  const leaderName = user.cell.leader
-    ? `${user.cell.leader.firstName} ${user.cell.leader.lastName}`
-    : 'No Leader Assigned'
+  // const leaderName = user.cell.leader
+  //   ? `${user.cell.leader.firstName} ${user.cell.leader.lastName}`
+  //   : 'No Leader Assigned'
+  const leaderName =
+    onboardingCellLeader ||
+    `${user.cell.leader.firstName} ${user.cell.leader.lastName}` ||
+    'No Cell leader'
 
   return (
-    <div className='px-4 py-4 lg:py-2 mt-4 outline-1 rounded-md shadow-sm'>
+    <div className='px-4 py-4 lg:py-2 mt-4 outline-1 rounded-md shadow-sm relative'>
+      {onboardingCellName && (
+        <div className='absolute top-0.5 w-full flex justify-center'>
+          <p className=' text-xs bg-green-300 rounded-full p-0.5 text-center'>
+            Onboarding
+          </p>
+        </div>
+      )}
       {/* HEAD  */}
       <div className='flex items-center justify-between px-5'>
-        <h2 className='font-bold text-lg'>{user.cell.name}</h2>
+        <h2 className='font-bold text-lg'>{displayCellName}</h2>
         <Image
           src='/assets/logo.jpeg'
           alt='logo'

@@ -47,7 +47,11 @@ import { useUser } from '@/utils/userContext'
 import { RightDrawer } from './RightDrawer'
 import JoinCell from '../forms/JoinCell'
 import { useState } from 'react'
-import { useJoinCell, useJoinDept, useJoinSmallGroup } from '@/hooks/use-church'
+import {
+  useJoinCell,
+  useJoinDepartment,
+  useJoinSmallGroup,
+} from '@/hooks/use-church'
 import JoinDept from '../forms/joinDept'
 import JoinSMG from '../forms/JoinSmallGroup'
 import JoinSmallGroup from '../forms/JoinSmallGroup'
@@ -61,13 +65,21 @@ const mainItems = [
 
 export function AppSidebar() {
   const { user } = useUser()
+  // console.log('App Sidebar:', user)
 
   // Form States
   const [isSubmitDisabled, setIsSubmitDisabled] = useState(true)
   const [isOpen, setIsOpen] = useState<'dept' | 'cell' | 'smg' | null>(null)
   const joinCell = useJoinCell()
-  const joinDept = useJoinDept()
+  const joinDept = useJoinDepartment()
   const joinSMG = useJoinSmallGroup()
+
+  const onboardingCellName = user?.onboardingParticipations?.find(
+    (p) => p.onboardingRoom.cell !== null,
+  )?.onboardingRoom.cell?.name
+
+  const displayCellName =
+    user?.cell?.name || onboardingCellName || 'Join a Cell'
 
   return (
     <Sidebar
@@ -178,12 +190,19 @@ export function AppSidebar() {
           <SidebarMenu>
             <SidebarMenuItem>
               <SidebarMenuButton asChild tooltip='Cell'>
-                <Link href='/dashboard/cell'>
+                {/* <Link href='/dashboard/cell'> */}
+                <Link
+                  href={
+                    onboardingCellName
+                      ? '/dashboard/onboarding'
+                      : '/dashboard/cell'
+                  }
+                >
                   <School />
-                  <span>{user?.cell?.name || 'Join a Cell'}</span>
+                  <span>{displayCellName}</span>
                 </Link>
               </SidebarMenuButton>
-              {!user?.cell && (
+              {!user?.cell && !onboardingCellName && (
                 <RightDrawer
                   trigger={
                     <SidebarMenuAction>

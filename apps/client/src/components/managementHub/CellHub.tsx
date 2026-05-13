@@ -6,7 +6,6 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Progress } from '@/components/ui/progress'
 import {
-  UserPlus,
   PhoneCall,
   Calendar,
   CheckCircle2,
@@ -19,22 +18,48 @@ import {
   X,
   Send,
   Users,
+  ArrowRight,
+  Loader2,
+  PlusCircle,
 } from 'lucide-react'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs'
 import { Badge } from '../ui/badge'
 import { CreateAnnouncementForm } from '../forms/AnnouncementForm'
-import { LeadershipProfile } from '@repo/types'
+import { useGetRoomParticipants, useLeaderCell } from '@/hooks/get-church'
+import {
+  useApproveOnboarding,
+  useCreateOnboardingRoom,
+  useExtendOnboarding,
+} from '@/hooks/use-church'
+import Link from 'next/link'
+import { getNextMeetingDate } from '@/lib/utils'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '../ui/dropdown-menu'
+import { GroupAvatar } from '../dashboard/GroupAvatar'
+import { User } from '@repo/types'
 
 export default function CellHub({ leadership }: { leadership: any[] }) {
   const [selectedCellId, setSelectedCellId] = useState(
     leadership?.[0]?.id || '',
   )
   const activeCell = leadership.find((c) => c.id === selectedCellId)
+  const { data: cell, isLoading } = useLeaderCell(activeCell.id)
+  const { mutate: createRoom, isPending } = useCreateOnboardingRoom()
+  const roomId = cell?.onboardingRoom?.id
+  const { data: room } = useGetRoomParticipants(roomId as string)
+  const { mutate: approve } = useApproveOnboarding()
+  const { mutate: extend } = useExtendOnboarding()
+
+  const nextMeeting = getNextMeetingDate()
+  const hasRoom = !!cell?.onboardingRoom
+  const applicants = room?.applicants
+  const members = cell?.users
 
   // 1. Mock Data (Ideally from useQuery)
-  const [applications, setApplications] = useState([
-    { id: '1', name: 'Michael Chen', date: '2h ago', source: 'Website' },
-  ])
   const cellData = {
     name: 'Bethel Alpha',
     growthTarget: 75,
@@ -56,7 +81,10 @@ export default function CellHub({ leadership }: { leadership: any[] }) {
     <div className='space-y-6 animate-in fade-in duration-500 pb-20'>
       {/* --- SECTION 1: TOP METRICS --- */}
       <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
-        <Card className='bg-blue-600 text-white border-none shadow-md'>
+        <Card className='bg-blue-600 text-white border-none shadow-md relative'>
+          <CardHeader>
+            <h2 className=' font-bold text-2xl'>{activeCell?.name} </h2>
+          </CardHeader>
           <CardContent className='p-6'>
             <p className='text-blue-100 text-sm font-medium'>
               Monthly Growth Target
@@ -75,18 +103,23 @@ export default function CellHub({ leadership }: { leadership: any[] }) {
         <Card className='flex items-center justify-between p-6'>
           <div>
             <p className='text-sm text-muted-foreground'>Active Members</p>
-            <h3 className='text-3xl font-bold'>{cellData.members}</h3>
+            <h3 className='text-3xl font-bold text-center'>
+              {cell?._count.users}
+            </h3>
           </div>
-          <div className='p-3 bg-green-100 rounded-full text-green-600'>
-            <UserPlus size={24} />
+          <div className='flex flex-row items-center mt-3'>
+            <GroupAvatar members={members as User[]} />
+            <p className='text-[11px] pl-3 font-medium text-gray-500 dark:text-gray-400 whitespace-nowrap'>
+              {members?.length || 0} Members
+            </p>
           </div>
         </Card>
 
         <Card className='flex items-center justify-between p-6'>
           <div>
             <p className='text-sm text-muted-foreground'>Avg. Attendance</p>
-            <h3 className='text-3xl font-bold'>
-              {cellData.lastMeetingAttendance}
+            <h3 className='text-3xl font-bold text-center'>
+              {cell?._count.users}
             </h3>
           </div>
           <div className='p-3 bg-purple-100 rounded-full text-purple-600'>
@@ -138,9 +171,7 @@ export default function CellHub({ leadership }: { leadership: any[] }) {
               <Calendar className='text-zinc-600' />
             </div>
             <h4 className='font-bold text-sm'>Next Cell Meeting</h4>
-            <p className='text-xs text-muted-foreground mt-1'>
-              Friday, Oct 24th • 6:00 PM
-            </p>
+            <p className='text-xs text-muted-foreground mt-1'>{nextMeeting}</p>
             <Button className='w-full mt-4 bg-blue-600 hover:bg-blue-700'>
               Log Attendance
             </Button>
@@ -237,39 +268,111 @@ export default function CellHub({ leadership }: { leadership: any[] }) {
 
         {/* Right Col: Applications & Invites */}
         <div className='space-y-6'>
-          <Card>
+          <Card className='overflow-hidden'>
             <CardHeader className='pb-3'>
               <CardTitle className='text-sm uppercase text-muted-foreground'>
-                Applications
+                Onboarding & Applications
               </CardTitle>
             </CardHeader>
+
             <CardContent>
-              {applications.map((app) => (
-                <div
-                  key={app.id}
-                  className='flex items-center justify-between gap-2 bg-zinc-50 p-2 rounded-lg border'
-                >
-                  <span className='text-xs font-medium truncate'>
-                    {app.name}
-                  </span>
-                  <div className='flex gap-1'>
+              {hasRoom ? (
+                <div className='space-y-3'>
+                  {applicants?.length > 0 ? (
+                    applicants?.map((app: any) => (
+                      <div
+                        key={app.id}
+                        className='flex items-center justify-between gap-2 bg-zinc-50 dark:bg-zinc-900 p-2 rounded-lg border'
+                      >
+                        <span className='text-xs font-medium truncate'>
+                          {app.user.firstName} {app.user.lastName}
+                        </span>
+                        <div className='flex gap-1'>
+                          {/* <Button
+                            size='icon'
+                            variant='ghost'
+                            className='h-6 w-6 text-red-500'
+                          >
+                            <X size={14} />
+                          </Button> */}
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button
+                                size='icon'
+                                variant='ghost'
+                                className='h-6 w-6 text-red-500 hover:bg-red-50'
+                              >
+                                <X size={14} />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align='end'>
+                              <div className='px-2 py-1.5 text-[10px] font-semibold text-muted-foreground uppercase'>
+                                Extend Probation
+                              </div>
+                              <DropdownMenuItem
+                                className='text-xs'
+                                onClick={() => extend({ id: app.id, weeks: 2 })}
+                              >
+                                + 2 Weeks
+                              </DropdownMenuItem>
+                              <DropdownMenuItem
+                                className='text-xs'
+                                onClick={() => extend({ id: app.id, weeks: 4 })}
+                              >
+                                + 4 Weeks
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                          <Button
+                            onClick={() => approve(app.id)}
+                            size='icon'
+                            variant='ghost'
+                            className='h-6 w-6 text-green-500 hover:bg-green-50'
+                          >
+                            <Check size={14} />
+                          </Button>
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <p className='text-xs text-center text-muted-foreground py-4'>
+                      No active applications
+                    </p>
+                  )}
+                  <Link
+                    href={`/dashboard/onboarding/${cell?.onboardingRoom?.id}`}
+                    className='block'
+                  >
                     <Button
-                      size='icon'
-                      variant='ghost'
-                      className='h-6 w-6 text-red-500'
+                      variant='outline'
+                      size='sm'
+                      className='w-full text-xs gap-2'
                     >
-                      <X size={14} />
+                      View Room <ArrowRight size={12} />
                     </Button>
-                    <Button
-                      size='icon'
-                      variant='ghost'
-                      className='h-6 w-6 text-green-500'
-                    >
-                      <Check size={14} />
-                    </Button>
-                  </div>
+                  </Link>
                 </div>
-              ))}
+              ) : (
+                <div className='text-center py-2 space-y-3'>
+                  <p className='text-xs text-muted-foreground'>
+                    Probation tracking is disabled for this cell.
+                  </p>
+                  <Button
+                    onClick={() => createRoom(activeCell?.id)}
+                    disabled={isPending}
+                    size='sm'
+                    className='w-full gap-2'
+                  >
+                    {isPending ? (
+                      <Loader2 className='animate-spin' size={14} />
+                    ) : (
+                      <>
+                        <PlusCircle size={14} /> Setup Room
+                      </>
+                    )}
+                  </Button>
+                </div>
+              )}
             </CardContent>
           </Card>
 

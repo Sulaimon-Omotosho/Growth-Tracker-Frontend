@@ -1,13 +1,6 @@
 'use client'
 
-import React, { useState } from 'react'
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-} from '@/components/ui/card'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Progress } from '@/components/ui/progress'
@@ -19,9 +12,6 @@ import {
   MessageCircle,
   Heart,
   BookOpen,
-  UserPlus,
-  Phone,
-  ChevronRight,
   Sparkles,
   Share2,
 } from 'lucide-react'
@@ -30,18 +20,10 @@ import CellSkeleton from '@/components/skeletons/CellSkeleton'
 import { format } from 'date-fns'
 import { getNextCellSunday } from '@/utils/date-utils'
 import LeaderContactCard from '@/components/dashboard/LeaderContactCard'
-import { RightDrawer } from '@/components/dashboard/RightDrawer'
-import JoinDept from '@/components/forms/joinDept'
-import { useJoinDept } from '@/hooks/use-church'
-import Link from 'next/link'
 
 export default function UserCellPage() {
   const { data: cell, isLoading, isError } = useMyCell()
   // console.log('Cell Page Data:', cell)
-
-  // const [isSubmitDisabled, setIsSubmitDisabled] = useState(true)
-  // const [isOpen, setIsOpen] = useState<'PrayerRequest' | null>(null)
-  // const joinDept = useJoinDept()
 
   if (isLoading) return <CellSkeleton />
   if (isError || !cell)
@@ -82,9 +64,11 @@ export default function UserCellPage() {
                 </AvatarFallback>
               </Avatar>
             ))}
-            <div className='w-12 h-12 rounded-full bg-blue-600 border-4 border-zinc-900 flex items-center justify-center text-xs font-bold'>
-              +{cell._count.users - 1}
-            </div>
+            {cell._count.users > 3 && (
+              <div className='w-12 h-12 rounded-full bg-blue-600 border-4 border-zinc-900 flex items-center justify-center text-xs font-bold'>
+                +{cell._count.users - 3}
+              </div>
+            )}
           </div>
         </div>
       </div>

@@ -24,7 +24,6 @@ const ROLE_CONFIG = {
 type RoleType = keyof typeof ROLE_CONFIG
 
 export default function ManagementHub() {
-  // const { data: userDb, isLoading } = useMe()
   const { data: leadership, isLoading } = useLeadershipProfile()
   // console.log('Management Hub:', leadership)
 

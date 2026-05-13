@@ -1,4 +1,4 @@
-import { Cell, Department, SmallGroup, Zone } from './church'
+import { Cell, Department, OnboardingRoom, SmallGroup, Zone } from './church'
 
 export enum Role {
   CAMPUS_PASTOR = 'CAMPUS_PASTOR',
@@ -35,6 +35,7 @@ export interface User {
   departments?: Department[]
   smallGroups?: SmallGroup[]
   address?: Address
+  onboardingParticipations?: OnboardingRoom[]
   _count?: any
 }
 

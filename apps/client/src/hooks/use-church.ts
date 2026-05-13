@@ -1,5 +1,6 @@
 import { fetcher } from '@/lib/fetcher'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 
 // Search for Communities
@@ -75,39 +76,50 @@ export const useSearchCellsByCommunity = () => {
 }
 
 // Join A Cell
-export const useJoinCell = () => {
+export function useJoinCell() {
   const queryClient = useQueryClient()
 
   return useMutation({
     mutationFn: async ({ cellId }: { cellId: string }) => {
-      const data = await fetcher(`/church/members/join/cell`, {
+      const data = await fetcher(`/small-groups/join/${cellId}`, {
         method: 'POST',
         body: JSON.stringify({ cellId }),
       })
       return data
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['auth-user'] })
-      toast.success('Cell joined successfully')
+      queryClient.invalidateQueries({ queryKey: ['my-onboardings'] })
+      toast.success('Cell onboarding joined successfully')
     },
   })
 }
 
 // Join Department
-export const useJoinDept = () => {
-  const queryClient = useQueryClient()
+// export const useJoinDept = () => {
+//   const queryClient = useQueryClient()
 
+//   return useMutation({
+//     mutationFn: async ({ deptId }: { deptId: string }) => {
+//       const data = await fetcher(`/church/members/join/dept`, {
+//         method: 'POST',
+//         body: JSON.stringify({ deptId }),
+//       })
+//       return data
+//     },
+//     onSuccess: () => {
+//       queryClient.invalidateQueries({ queryKey: ['auth-user'] })
+//       toast.success('Joined department successfully')
+//     },
+//   })
+// }
+export function useJoinDepartment() {
+  const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: async ({ deptId }: { deptId: string }) => {
-      const data = await fetcher(`/church/members/join/dept`, {
-        method: 'POST',
-        body: JSON.stringify({ deptId }),
-      })
-      return data
-    },
+    mutationFn: (deptId: string) =>
+      fetcher(`/workforce/${deptId}/join`, { method: 'POST' }),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['auth-user'] })
-      toast.success('Joined department successfully')
+      toast.success('Joined department onboarding successfully')
+      queryClient.invalidateQueries({ queryKey: ['my-onboardings'] })
     },
   })
 }
@@ -165,6 +177,80 @@ export function useEnrollInCourse() {
       const errorMessage =
         error?.message || 'Failed to enroll. Please try again.'
       toast.error(errorMessage)
+    },
+  })
+}
+
+// Onboarding Action
+export function useApproveOnboarding() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (participantId: string) =>
+      fetcher(`/small-groups/onboarding/approve/${participantId}`, {
+        method: 'PATCH',
+      }),
+    onSuccess: (_, participantId) => {
+      queryClient.invalidateQueries({ queryKey: ['onboarding-room'] })
+      queryClient.invalidateQueries({ queryKey: ['my-onboardings'] })
+      toast.success('Member now approved successfully')
+    },
+  })
+}
+
+export function useExtendOnboarding() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: ({ id, weeks }: { id: string; weeks: 2 | 4 }) =>
+      fetcher(`/small-groups/onboarding/extend/${id}`, {
+        method: 'PATCH',
+        body: JSON.stringify({ weeks }),
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['onboarding-room'] })
+      toast.success('Member onboarding extended successfully')
+    },
+  })
+}
+
+export function useExitOnboarding() {
+  const queryClient = useQueryClient()
+  const router = useRouter()
+
+  return useMutation({
+    mutationFn: (roomId: string) =>
+      fetcher(`/small-groups/onboarding/exit/${roomId}`, { method: 'DELETE' }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['my-onboardings'] })
+      toast.success('You have successfully exited the onboarding process.')
+      router.push('/dashboard/onboarding')
+    },
+    onError: (error: any) => {
+      toast.error(error.message || 'Failed to exit onboarding')
+    },
+  })
+}
+
+export function useCreateOnboardingRoom() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: async (cellId: string) => {
+      const newRoom = await fetcher(
+        `/small-groups/cell/${cellId}/onboarding/init`,
+        {
+          method: 'POST',
+        },
+      )
+      return newRoom
+    },
+    // onSuccess: (newRoom) => {
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['cells'] })
+      queryClient.invalidateQueries({ queryKey: ['my-leads'] })
+      toast.success('Onboarding room initialized successfully')
+    },
+    onError: (error: any) => {
+      toast.error(error.message || 'Failed to initialize room')
     },
   })
 }

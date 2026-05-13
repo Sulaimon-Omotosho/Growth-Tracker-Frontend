@@ -1,7 +1,15 @@
 'use client'
 
 import { fetcher } from '@/lib/fetcher'
-import { Cell, Course, Department, SmallGroup, Teams } from '@repo/types'
+import {
+  Cell,
+  Course,
+  Department,
+  OnboardingParticipant,
+  OnboardingRoom,
+  SmallGroup,
+  Teams,
+} from '@repo/types'
 import { useQuery } from '@tanstack/react-query'
 
 // Departments
@@ -41,6 +49,42 @@ export function useMyCell() {
     queryKey: ['my-cell'],
     queryFn: () => fetcher('/church/get/my-cell'),
     staleTime: 1000 * 60 * 30,
+  })
+}
+
+export function useLeaderCell(cellId: string) {
+  return useQuery<Cell>({
+    queryKey: ['my-cell'],
+    queryFn: () => fetcher(`/small-groups/cell/${cellId}`),
+    staleTime: 1000 * 60 * 30,
+  })
+}
+
+// Onboarding
+export function useGetOnboardingRoom(roomId: string) {
+  return useQuery<OnboardingRoom>({
+    queryKey: ['onboarding-room', roomId],
+    queryFn: () => fetcher(`/small-groups/onboarding-room/${roomId}`),
+    enabled: !!roomId,
+    staleTime: 1000 * 60 * 5,
+  })
+}
+
+export function useGetMyOnboardings() {
+  return useQuery({
+    queryKey: ['my-onboardings'],
+    queryFn: () => fetcher('/users/onboarding/me'),
+    staleTime: 1000 * 60 * 5,
+  })
+}
+
+export function useGetRoomParticipants(roomId: string) {
+  return useQuery({
+    queryKey: ['onboarding-room', roomId],
+    queryFn: () =>
+      fetcher(`/small-groups/onboarding-room/participants/${roomId}`),
+    enabled: !!roomId,
+    staleTime: 1000 * 60 * 5,
   })
 }
 

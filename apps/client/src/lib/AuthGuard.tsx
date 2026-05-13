@@ -30,8 +30,8 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
       }
     }
 
-    if (!isLoading && !user && !isError && pathname !== '/login') {
-      router.push('/login')
+    if (!isLoading && !user && !isError && pathname !== '/sign-in') {
+      router.push('/sign-in')
     }
   }, [isError, error, logout, user, isLoading, pathname, router])
   return <>{children}</>

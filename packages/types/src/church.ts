@@ -86,6 +86,8 @@ export interface Cell {
   _count?: any
   isOnline?: boolean
   address?: Address
+  onboardingRoom?: OnboardingRoom
+  resources?: string
 }
 
 export interface SmallGroup {
@@ -138,6 +140,32 @@ export interface CourseSession {
   // attendance:  SessionAttendance[]
 }
 
+export interface OnboardingRoom {
+  id: String
+  departmentId?: String
+  department?: Department
+  cellId?: String
+  cell?: Cell
+  applicants: OnboardingParticipant[]
+  onboardingRoom: OnboardingRoom
+  currentUserParticipation?: string
+  requirements?: string
+}
+
+export interface OnboardingParticipant {
+  id: string
+  joinedAt: string
+  expectedEndDate: string
+  status: OnboardingStatus
+  extensionWeeks: number
+  userId: string
+  user: User
+  cell?: string
+  department?: string
+  onboardingRoomId: string
+  onboardingRoom: OnboardingRoom
+}
+
 export interface CourseEnrollment {
   id: String
   userId: String
@@ -159,4 +187,11 @@ export const enum CourseStatus {
   IN_PROGRESS,
   COMPLETED,
   DROPPED,
+}
+
+export const enum OnboardingStatus {
+  ONBOARDING,
+  EXTENDED,
+  APPROVED,
+  REJECTED,
 }

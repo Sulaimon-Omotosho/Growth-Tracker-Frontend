@@ -11,11 +11,19 @@ export default function OnboardingPage() {
   const { data: user, isLoading, error } = useMe()
   const router = useRouter()
 
+  // useEffect(() => {
+  //   if (!isLoading && !user) {
+  //     router.push('/sign-in')
+  //   }
+  // }, [user, isLoading, router])
+
   useEffect(() => {
-    if (user?.username) {
+    if (!isLoading && !user) {
+      router.push('/sign-in')
+    } else if (user?.username) {
       router.replace('/dashboard')
     }
-  }, [user, router])
+  }, [user, isLoading, router])
 
   if (isLoading) {
     return (
