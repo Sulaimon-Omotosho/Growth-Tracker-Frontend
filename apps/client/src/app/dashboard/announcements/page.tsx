@@ -23,10 +23,20 @@ export default function AnnouncementsPage() {
   const [searchQuery, setSearchQuery] = useState('')
   const [activeTab, setActiveTab] = useState('ALL')
 
-  const filteredAnnouncements = useMemo(() => {
-    if (!announcements) return []
+  const announcementList = useMemo(
+    () =>
+      Array.isArray(announcements)
+        ? announcements
+        : announcements
+          ? [announcements]
+          : [],
+    [announcements],
+  )
 
-    return announcements.filter((ann: any) => {
+  const filteredAnnouncements = useMemo(() => {
+    if (announcementList.length === 0) return []
+
+    return announcementList.filter((ann: any) => {
       const matchesSearch =
         ann.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
         ann.content.toLowerCase().includes(searchQuery.toLowerCase())
@@ -35,7 +45,7 @@ export default function AnnouncementsPage() {
 
       return matchesSearch && matchesTab
     })
-  }, [announcements, searchQuery, activeTab])
+  }, [announcementList, searchQuery, activeTab])
 
   return (
     <div className='max-w-5xl mx-auto p-4 md:p-8 space-y-6'>
