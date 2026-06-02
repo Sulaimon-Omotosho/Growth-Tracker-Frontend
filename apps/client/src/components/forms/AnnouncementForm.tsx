@@ -53,7 +53,7 @@ export function CreateAnnouncementForm({
   const { mutate, isPending } = useCreateAnnouncement()
 
   const onSubmit = (data: AnnouncementFormValues) => {
-    console.log('Announcement Form:', data)
+    // console.log('Announcement Form:', data)
 
     mutate(data, {
       onSuccess: () => {

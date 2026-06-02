@@ -1,5 +1,5 @@
 import { fetcher } from '@/lib/fetcher'
-import { Event } from '@repo/types'
+import { Announcement, Event } from '@repo/types'
 import { useQuery } from '@tanstack/react-query'
 
 // EVENTS
@@ -24,7 +24,7 @@ export function useGetUpcomingEvents() {
 
 // ANNOUNCEMENTS
 export function useAnnouncements() {
-  return useQuery({
+  return useQuery<Announcement>({
     queryKey: ['announcements', 'feed'],
     queryFn: () => fetcher('/events/my-announcements'),
     staleTime: 1000 * 60 * 5,
