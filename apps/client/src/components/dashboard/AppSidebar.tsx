@@ -144,24 +144,7 @@ export function AppSidebar() {
           <SidebarGroupLabel className='px-4 text-[10px] font-bold uppercase tracking-widest text-gray-400'>
             Growth Journey
           </SidebarGroupLabel>
-          {/* <SidebarGroupContent> */}
           <SidebarMenu>
-            {/* <SidebarMenuItem>
-              <SidebarMenuButton asChild tooltip='Growth Track'>
-                <Link href='/growth_track'>
-                  <ChartLine /> <Waves />
-                  <span>Growth Track</span>
-                </Link>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-            <SidebarMenuItem>
-              <SidebarMenuButton asChild tooltip='Foundation Class'>
-                <Link href='/foundation'>
-                  <BrickWallShield />
-                  Foundation Class
-                </Link>
-              </SidebarMenuButton>
-            </SidebarMenuItem> */}
             <SidebarMenuItem>
               <SidebarMenuButton asChild tooltip='Baptism'>
                 <Link href='/dashboard/courses/enrolled'>
@@ -178,7 +161,6 @@ export function AppSidebar() {
               </SidebarMenuButton>
             </SidebarMenuItem>
           </SidebarMenu>
-          {/* </SidebarGroupContent> */}
         </SidebarGroup>
 
         {/* Small Groups  */}
@@ -186,11 +168,9 @@ export function AppSidebar() {
           <SidebarGroupLabel className='px-4 text-[10px] font-bold uppercase tracking-widest text-gray-400'>
             Community
           </SidebarGroupLabel>
-          {/* <SidebarGroupContent> */}
           <SidebarMenu>
             <SidebarMenuItem>
               <SidebarMenuButton asChild tooltip='Cell'>
-                {/* <Link href='/dashboard/cell'> */}
                 <Link
                   href={
                     onboardingCellName

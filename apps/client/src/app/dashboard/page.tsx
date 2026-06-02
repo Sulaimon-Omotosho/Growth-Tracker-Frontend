@@ -150,19 +150,19 @@ const UserDashboard = () => {
                   {announcementsLoading ? (
                     <p>Loading your feed...</p>
                   ) : (
-                    announcements
-                      ?.slice(0, 4)
-                      .map((ann: any) => (
-                        <AnnouncementCard
-                          key={ann.id}
-                          title={ann.title}
-                          content={ann.content}
-                          authorName={`${ann.author?.firstName} ${ann.author?.lastName}`}
-                          date={ann.createdAt}
-                          priority={ann.priority}
-                          scope={ann.scope}
-                        />
-                      ))
+                    Array.isArray(announcements)
+                      ? announcements.slice(0, 4).map((ann: any) => (
+                          <AnnouncementCard
+                            key={ann.id}
+                            title={ann.title}
+                            content={ann.content}
+                            authorName={`${ann.author?.firstName} ${ann.author?.lastName}`}
+                            date={ann.createdAt}
+                            priority={ann.priority}
+                            scope={ann.scope}
+                          />
+                        ))
+                      : null
                   )}
 
                   <Link
